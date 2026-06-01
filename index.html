@@ -24,11 +24,11 @@
         <button class="nav-item" data-view-target="orders"><span class="icon bag"></span>Dalabyo</button>
         <button class="nav-item" data-view-target="invoices"><span class="icon receipt"></span>Biilal</button>
         <button class="nav-item" data-view-target="analytics"><span class="icon chart"></span>Falanqeyn</button>
-        <button class="nav-item"><span class="icon gear"></span>Dejin</button>
+        <button class="nav-item" data-view-target="settings"><span class="icon gear"></span>Dejin</button>
       </nav>
 
       <div class="sidebar-bottom">
-        <button class="new-order">+ Dalab Cusub</button>
+        <button class="new-order" data-new-order>+ Dalab Cusub</button>
         <a href="#">Xaaladda Nidaamka</a>
         <a href="#">Caawimo</a>
       </div>
@@ -57,8 +57,8 @@
               <p>Maamul sax ah oo loogu talagalay hawlaha harqaankaaga.</p>
             </div>
             <div class="head-actions">
-              <button class="outline-btn">Bishan</button>
-              <button class="outline-btn">Soo saar Warbixin</button>
+              <button class="outline-btn" data-cycle-period>Bishan</button>
+              <button class="outline-btn" data-export-report>Soo saar Warbixin</button>
             </div>
           </div>
 
@@ -92,7 +92,7 @@
             </article>
 
             <article class="panel table-panel">
-              <div class="panel-title"><h3>Macaamiil Dhawaan</h3><a href="#">Eeg Diiwaanka</a></div>
+              <div class="panel-title"><h3>Macaamiil Dhawaan</h3><a href="#" data-show-customers>Eeg Diiwaanka</a></div>
               <table>
                 <thead><tr><th>Macmiil</th><th>Xaalad</th><th>Cabbirkii U Dambeeyay</th><th>Ficil</th></tr></thead>
                 <tbody data-customers-table>
@@ -107,7 +107,7 @@
               <div class="invoice-row"><span></span><div><strong>#INV-20492</strong><small>Ali Omar</small></div><b>$450.00</b><em>La bixiyay</em></div>
               <div class="invoice-row"><span></span><div><strong>#INV-20493</strong><small>Idil Yusuf</small></div><b>$1,200.00</b><em>Sugaya</em></div>
               <div class="invoice-row"><span></span><div><strong>#INV-20494</strong><small>Sahra Adan</small></div><b>$850.00</b><em class="danger">Daahay</em></div>
-              <button class="muted-btn">Dhammaan Biilasha</button>
+              <button class="muted-btn" data-show-invoices>Dhammaan Biilasha</button>
             </article>
           </div>
         </section>
@@ -117,7 +117,7 @@
             <div class="photo">Sawir</div>
             <div><p class="kicker">Xogta Macmiilka</p><h2>Abdirahman Ali</h2><p class="meta">Muqdisho, Soomaaliya &middot; +252 61 555 1234</p></div>
             <span class="vip">Macmiil Heer Sare</span>
-            <div class="profile-actions"><button class="black-btn">Wax ka beddel Cabbirrada</button><button class="outline-btn">Dalab Cusub</button></div>
+            <div class="profile-actions"><button class="black-btn" data-edit-profile-measures>Wax ka beddel Cabbirrada</button><button class="outline-btn" data-new-order>Dalab Cusub</button></div>
           </div>
           <div class="profile-grid">
             <article class="panel measure-card">
@@ -127,9 +127,9 @@
                 <div><span>Gacan</span><strong>25.5<small>in</small></strong></div><div><span>Qoorta</span><strong>16.5<small>in</small></strong></div><div><span>Miskaha</span><strong>44.0<small>in</small></strong></div><div><span>Bawdo</span><strong>27.0<small>in</small></strong></div>
               </div>
             </article>
-            <article class="panel style-card"><h3>Doorbidka Qaabka</h3><p>"Wuxuu jecel yahay xariir gudaha qoorta iyo gacmaha."</p><p>"Tol laba-jibbaar ah qoorta si uu u adkaado."</p><p>"Jeebab laabta ah ha lagu darin khamiiska haddii aan la codsan."</p><button class="muted-btn">Ku dar Qoraal</button></article>
-            <article class="panel order-history"><div class="panel-title"><h3>Taariikhda Dalabyada</h3><a href="#">Eeg dhammaan</a></div><div class="history-item"><span></span><div><strong>Macawiis Xariir & Khamiis</strong><small>Dalab #ELT-9821 &middot; 24 Okt 2023</small></div><mark>Tolid</mark><b>$450.00</b></div><div class="history-item"><span></span><div><strong>Suud Talyaani ah</strong><small>Dalab #ELT-8762 &middot; 15 Agoosto 2023</small></div><mark class="gray">Dhammaaday</mark><b>$1,200.00</b></div></article>
-            <article class="panel update-card"><h3>Cusbooneysiin Degdeg ah</h3><p>U dir macmiilka fariimo WhatsApp ah oo ku saabsan xaaladda dalabka iyo xusuusinta ballanta.</p><button class="whatsapp-btn">Ogeysii WhatsApp</button></article>
+            <article class="panel style-card"><h3>Doorbidka Qaabka</h3><p>"Wuxuu jecel yahay xariir gudaha qoorta iyo gacmaha."</p><p>"Tol laba-jibbaar ah qoorta si uu u adkaado."</p><p>"Jeebab laabta ah ha lagu darin khamiiska haddii aan la codsan."</p><button class="muted-btn" data-add-note>Ku dar Qoraal</button></article>
+            <article class="panel order-history"><div class="panel-title"><h3>Taariikhda Dalabyada</h3><a href="#" data-show-orders>Eeg dhammaan</a></div><div class="history-item"><span></span><div><strong>Macawiis Xariir & Khamiis</strong><small>Dalab #ELT-9821 &middot; 24 Okt 2023</small></div><mark>Tolid</mark><b>$450.00</b></div><div class="history-item"><span></span><div><strong>Suud Talyaani ah</strong><small>Dalab #ELT-8762 &middot; 15 Agoosto 2023</small></div><mark class="gray">Dhammaaday</mark><b>$1,200.00</b></div></article>
+            <article class="panel update-card"><h3>Cusbooneysiin Degdeg ah</h3><p>U dir macmiilka fariimo WhatsApp ah oo ku saabsan xaaladda dalabka iyo xusuusinta ballanta.</p><button class="whatsapp-btn" data-whatsapp-update>Ogeysii WhatsApp</button></article>
           </div>
         </section>
 
@@ -146,7 +146,7 @@
         </section>
 
         <section class="view" id="orders">
-          <div class="page-head"><div><h2>Raad-raaca Dalabyada</h2><p>Xaaladda dalabyada socda waqtiga-dhabta ah.</p></div><div class="head-actions"><button class="outline-btn">Shaandhee</button><button class="outline-btn">Soo saar</button></div></div>
+          <div class="page-head"><div><h2>Raad-raaca Dalabyada</h2><p>Xaaladda dalabyada socda waqtiga-dhabta ah.</p></div><div class="head-actions"><button class="outline-btn" data-filter-orders>Shaandhee</button><button class="outline-btn" data-export-orders>Soo saar</button></div></div>
           <div class="kanban">
             <div class="lane"><h3>Cusub <span>3</span></h3><article class="order-card"><small>#ORD-8821</small><h4>Ahmed Hassan</h4><p>Khamiis gaar ah &middot; Linen Talyaani ah</p><footer><span class="mini-avatar navy">JS</span><b>2 maalmood gudahood</b></footer></article><article class="order-card"><small>#ORD-8825</small><h4>Mariam Yusuf</h4><p>Baati aroos &middot; Xariir qurxin leh</p><footer><span class="mini-avatar gold"></span><b>24 Okt</b></footer></article></div>
             <div class="lane"><h3>Jarid <span>1</span></h3><article class="order-card top-line"><small>#ORD-8812</small><h4>Omar Farah</h4><p>Macawiis qurux badan &middot; Cudbi tayo sare leh</p><footer><span class="mini-avatar photo"></span><b>Berri</b></footer></article></div>
@@ -189,16 +189,35 @@
           </div>
         </section>
 <section class="view" id="invoices">
-          <div class="page-head"><div><h2>Biilal & Lacag-bixin</h2><p>Maamul lacagaha macmiilka iyo diiwaanka maaliyadda.</p></div><div class="head-actions"><button class="outline-btn">Soo saar Warqad</button><button class="primary-small">Samee Biil Cusub</button></div></div>
+          <div class="page-head"><div><h2>Biilal & Lacag-bixin</h2><p>Maamul lacagaha macmiilka iyo diiwaanka maaliyadda.</p></div><div class="head-actions"><button class="outline-btn" data-export-invoice>Soo saar Warqad</button><button class="primary-small" data-new-invoice>Samee Biil Cusub</button></div></div>
           <div class="billing-grid">
             <div class="billing-stats"><article class="panel money-card"><p>La bixiyay</p><strong>$12,450</strong></article><article class="panel money-card danger"><p>Daahay</p><strong>$1,280</strong></article><article class="panel collection"><p>Ururinta Bishan</p><strong>$4,820</strong><small>+12.5% bishii hore</small></article></div>
             <article class="panel transaction-card"><h3>Macamiladii Dhawaa</h3><table><tbody><tr><td>#INV-9821</td><td>Ahmed Hassan</td><td>24 Okt 2023</td><td><b>$450.00</b></td><td><mark>La bixiyay</mark></td></tr><tr><td>#INV-9819</td><td>Muna Farah</td><td>22 Okt 2023</td><td><b>$1,200.00</b></td><td><mark class="sand">Qeyb</mark></td></tr><tr><td>#INV-9815</td><td>Jama Duale</td><td>18 Okt 2023</td><td><b>$850.00</b></td><td><mark class="red">Daahay</mark></td></tr></tbody></table></article>
             <article class="panel invoice-preview"><h3>BIIL</h3><p>Tixraac: #INV-9821</p><div class="invoice-address"><strong>Waxaa lagu qoray:</strong><b>Ahmed Hassan</b><span>KM4 Area, Hodan<br />+252 61 XXX XXXX</span></div><table><tbody><tr><td>Suud xariir Talyaani ah</td><td>01</td><td>$350.00</td><td>$350.00</td></tr><tr><td>Shaati gacmo Faransiis ah</td><td>02</td><td>$50.00</td><td>$100.00</td></tr></tbody></table><footer><span>Wadar</span><strong>$450.00</strong></footer></article>
-            <aside class="panel payment-panel"><h3>Ficillo Degdeg ah</h3><button class="black-btn">Daabac Biil</button><button class="whatsapp-btn">WhatsApp Biil</button><button class="outline-btn">Iimayl PDF</button><h3>Hababka Lacagta</h3><div class="pay-method active">Zaad Service<small>Lacag moobil Telesom</small></div><div class="pay-method">EVC Plus<small>Lacag moobil Hormuud</small></div><div class="pay-method">Caddaan<small>Lacag gacanta ah</small></div><div class="pay-method">Sahal<small>Lacag moobil Golis</small></div></aside>
+            <aside class="panel payment-panel"><h3>Ficillo Degdeg ah</h3><button class="black-btn" data-print-invoice>Daabac Biil</button><button class="whatsapp-btn" data-whatsapp-invoice>WhatsApp Biil</button><button class="outline-btn" data-email-invoice>Iimayl PDF</button><h3>Hababka Lacagta</h3><button class="pay-method active" data-pay-method="Zaad Service">Zaad Service<small>Lacag moobil Telesom</small></button><button class="pay-method" data-pay-method="EVC Plus">EVC Plus<small>Lacag moobil Hormuud</small></button><button class="pay-method" data-pay-method="Caddaan">Caddaan<small>Lacag gacanta ah</small></button><button class="pay-method" data-pay-method="Sahal">Sahal<small>Lacag moobil Golis</small></button></aside>
+          </div>
+        </section>
+        <section class="view" id="settings">
+          <div class="page-head"><div><h2>Dejinta Nidaamka</h2><p>Macluumaadka ganacsiga iyo diyaarinta isku xirka Supabase.</p></div><div class="head-actions"><button class="black-btn" data-save-settings>Keydi Dejinta</button></div></div>
+          <div class="profile-grid">
+            <article class="panel">
+              <h3>Ganacsiga</h3>
+              <div class="form-grid settings-form">
+                <label>Magaca ganacsiga<input data-setting="businessName" value="Ganeey Tailor" /></label>
+                <label>Telefoon<input data-setting="businessPhone" value="+252 61 XXX XXXX" /></label>
+                <label>Magaalo<input data-setting="businessCity" value="Muqdisho" /></label>
+                <label>Lacagta<input data-setting="currency" value="USD" /></label>
+              </div>
+            </article>
+            <article class="panel update-card">
+              <h3>Supabase Ready</h3>
+              <p>Xogta hadda waxay ku kaydsan tahay browser-ka. Marka Supabase la xiro, customers, measurements, orders, invoices, iyo settings waa la wareejin karaa.</p>
+              <button class="muted-btn" data-system-status>Hubi Xaaladda</button>
+            </article>
           </div>
         </section>
       </main>
-      <button class="fab">+</button>
+      <button class="fab" data-open-customer>+</button>
     </div>
 
     <div class="modal" data-customer-modal aria-hidden="true">
@@ -216,6 +235,15 @@
         <p class="form-status" data-form-status></p>
         <div class="modal-actions"><button class="outline-btn" type="button" data-close-customer>Jooji</button><button class="black-btn" type="submit">Keydi Macmiil</button></div>
       </form>
+    </div>
+    <div class="modal" data-action-modal aria-hidden="true">
+      <div class="modal-card">
+        <button class="modal-close" type="button" data-close-action aria-label="Xir">x</button>
+        <p class="kicker" data-action-kicker>Nidaam</p>
+        <h2 data-action-title>Ficil</h2>
+        <p class="action-body" data-action-body></p>
+        <div class="modal-actions"><button class="black-btn" type="button" data-close-action>Haye</button></div>
+      </div>
     </div>
     <script src="script.js"></script>
   </body>
