@@ -25,10 +25,7 @@ const keys = {
   session: "tailor-system-supabase-session",
 };
 
-const defaultCustomers = [
-  { id: "sample-ahmed", name: "Ahmed Hassan", phone: "+252 61 555 1001", city: "Muqdisho", garment: "Suud Aroos", note: "" },
-  { id: "sample-muna", name: "Muna Farah", phone: "+252 61 555 1002", city: "Hargeysa", garment: "Dharka Habeenka", note: "" },
-];
+const defaultCustomers = [];
 
 let customers = [];
 let measurements = {};
@@ -343,6 +340,14 @@ const selectCustomer = (customer) => {
 };
 
 const renderCustomers = () => {
+  if (!customers.length) {
+    customersTable.innerHTML = `
+      <tr>
+        <td colspan="4"><div class="empty-state">Weli macmiil lama gelin. Ku dar macmiilka koowaad si xog dhab ah uga muuqato nidaamka.</div></td>
+      </tr>`;
+    return;
+  }
+
   customersTable.innerHTML = customers
     .map(
       (customer, index) => `
@@ -388,12 +393,14 @@ const renderSavedMeasurements = () => {
 };
 
 const renderAll = () => {
-  if (!customers.length) customers = [...defaultCustomers];
   selectedCustomer = selectedCustomer || customers[0];
   renderCustomers();
   if (selectedCustomer) {
     currentCustomer.textContent = selectedCustomer.name;
     measureBreadcrumb.textContent = `Macaamiil > ${selectedCustomer.name}`;
+  } else {
+    currentCustomer.textContent = "Macmiil lama dooran";
+    measureBreadcrumb.textContent = "Macaamiil > Macmiil lama dooran";
   }
   renderSavedMeasurements();
 };
@@ -484,6 +491,11 @@ customersTable.addEventListener("click", (event) => {
 });
 
 document.querySelector("[data-save-measurements]").addEventListener("click", async () => {
+  if (!selectedCustomer?.id) {
+    savedMeasures.innerHTML = "<small>Fadlan marka hore ku dar ama dooro macmiil dhab ah.</small>";
+    return;
+  }
+
   const record = collectMeasurementRecord();
   measurements[record.customerId] = record;
   renderSavedMeasurements();
