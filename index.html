@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="so">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Nidaam casri ah oo lagu maamulo ganacsiga harqaanka." />
+    <title>Somali Tailor Elite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <section class="auth-screen" data-auth-screen>
+      <div class="auth-brand">
+        <p class="kicker">Ganeey Tailor</p>
+        <h1>Somali Tailor Elite</h1>
+        <p>Ku soo gal nidaamka si aad u maamusho macaamiisha, cabbirrada, dalabyada, iyo biilasha harqaanka.</p>
+      </div>
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="is-active" type="button" data-auth-tab="signin">Sign in</button>
+          <button type="button" data-auth-tab="signup">Sign up</button>
+        </div>
+        <form class="auth-form is-active" data-auth-form="signin">
+          <h2>Ku soo gal</h2>
+          <label>Email<input name="email" type="email" autocomplete="email" required placeholder="you@example.com" /></label>
+          <label>Password<input name="password" type="password" autocomplete="current-password" required minlength="6" placeholder="Ugu yaraan 6 xaraf" /></label>
+          <button class="black-btn" type="submit">Sign in</button>
+        </form>
+        <form class="auth-form" data-auth-form="signup">
+          <h2>Account cusub</h2>
+          <label>Magaca<input name="name" autocomplete="name" required placeholder="Magacaaga" /></label>
+          <label>Email<input name="email" type="email" autocomplete="email" required placeholder="you@example.com" /></label>
+          <label>Password<input name="password" type="password" autocomplete="new-password" required minlength="6" placeholder="Ugu yaraan 6 xaraf" /></label>
+          <button class="black-btn" type="submit">Create account</button>
+        </form>
+        <p class="form-status" data-auth-status></p>
+      </div>
+    </section>
+
+    <aside class="sidebar" data-sidebar>
+      <div class="brand">
+        <h1>Somali Tailor Elite</h1>
+        <p>Maamulka harqaan heer sare ah</p>
+      </div>
+
+      <nav class="side-nav" aria-label="Qeybaha nidaamka">
+        <button class="nav-item is-active" data-view-target="dashboard"><span class="icon grid"></span>Guudmar</button>
+        <button class="nav-item" data-view-target="customers"><span class="icon users"></span>Macaamiil</button>
+        <button class="nav-item" data-view-target="measurements"><span class="icon ruler"></span>Cabbirro</button>
+        <button class="nav-item" data-view-target="orders"><span class="icon bag"></span>Dalabyo</button>
+        <button class="nav-item" data-view-target="invoices"><span class="icon receipt"></span>Biilal</button>
+        <button class="nav-item" data-view-target="analytics"><span class="icon chart"></span>Falanqeyn</button>
+        <button class="nav-item"><span class="icon gear"></span>Dejin</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <button class="new-order">+ Dalab Cusub</button>
+        <a href="#">Xaaladda Nidaamka</a>
+        <a href="#">Caawimo</a>
+      </div>
+    </aside>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <button class="menu-btn" data-menu-toggle aria-label="Fur menu"><span></span><span></span></button>
+        <label class="search">
+          <span></span>
+          <input type="search" placeholder="Raadi dalab, macmiil, ama biil..." />
+        </label>
+        <div class="top-actions">
+          <p class="sync-pill" data-sync-status>Supabase connecting...</p>
+          <button class="ghost-icon" aria-label="Ogeysiis"></button>
+          <button class="ghost-icon message" aria-label="Fariimo"></button>
+          <button class="primary-small" data-open-customer>Ku dar Macmiil</button>
+          <button class="outline-btn user-pill" data-user-pill type="button">User</button>
+          <button class="outline-btn" data-sign-out type="button">Sign out</button>
+          <div class="avatar">ST</div>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="view is-active" id="dashboard">
+          <div class="page-head">
+            <div>
+              <h2>Guudmarka Atelier-ka</h2>
+              <p>Maamul sax ah oo loogu talagalay hawlaha harqaankaaga.</p>
+            </div>
+            <div class="head-actions">
+              <button class="outline-btn">Bishan</button>
+              <button class="outline-btn">Soo saar Warbixin</button>
+            </div>
+          </div>
+
+          <div class="stats-grid">
+            <article class="stat-card"><span class="stat-icon navy"></span><p>Dalabyada Guud</p><strong>248</strong><em>+12% bishii hore</em></article>
+            <article class="stat-card"><span class="stat-icon sand"></span><p>Dalabyo Sugaya</p><strong>12</strong><em class="danger">Mudnaan sare</em></article>
+            <article class="stat-card"><span class="stat-icon soft"></span><p>La Dhammeeyay</p><strong>35</strong><em>Jadwal fiican</em></article>
+            <article class="stat-card"><span class="stat-icon bronze"></span><p>Dakhliga Guud</p><strong>$12,450</strong><em>+8% koror</em></article>
+          </div>
+
+          <div class="dash-grid">
+            <article class="panel revenue-panel">
+              <div class="panel-title">
+                <div><h3>Falanqeynta Dakhliga</h3><p>Kobaca dakhliga toddobaadlaha ah.</p></div>
+                <div class="legend"><span></span>Toddobaadkii hore <b></b>Toddobaadkan</div>
+              </div>
+              <div class="bar-chart">
+                <i style="--h:42%"></i><i style="--h:62%"></i><i style="--h:48%"></i><i style="--h:78%"></i><i class="accent" style="--h:88%"></i><i class="accent" style="--h:100%"></i><i class="outline" style="--h:20%"></i>
+              </div>
+              <div class="days"><span>Isn</span><span>Tala</span><span>Arb</span><span>Kha</span><span>Jim</span><span>Sab</span><span>Axd</span></div>
+            </article>
+
+            <article class="panel progress-panel">
+              <h3>Horumarka Hadda</h3>
+              <ol class="timeline">
+                <li class="done"><strong>Jarista Dharka</strong><span>8 dalab ayaa maanta dhammaaday</span></li>
+                <li class="done"><strong>Tolista</strong><span>4 shay ayaa la tolayaa</span></li>
+                <li class="active"><strong>Ballanta Cabirka</strong><span>Ballanta xigta: 2:00 galabnimo</span></li>
+                <li><strong>Diyaar u Qaadis</strong><span>Waxaa la qorsheeyay dhammaadka toddobaadka</span></li>
+              </ol>
+            </article>
+
+            <article class="panel table-panel">
+              <div class="panel-title"><h3>Macaamiil Dhawaan</h3><a href="#">Eeg Diiwaanka</a></div>
+              <table>
+                <thead><tr><th>Macmiil</th><th>Xaalad</th><th>Cabbirkii U Dambeeyay</th><th>Ficil</th></tr></thead>
+                <tbody data-customers-table>
+                  <tr><td><span class="mini-avatar navy">AH</span><div>Ahmed Hassan<small>Suud Aroos</small></div></td><td><mark>Tolid</mark></td><td>12 Okt 2023</td><td>...</td></tr>
+                  <tr><td><span class="mini-avatar gold">MF</span><div>Muna Farah<small>Dharka Habeenka</small></div></td><td><mark class="gray">Cabbir</mark></td><td>14 Okt 2023</td><td>...</td></tr>
+                </tbody>
+              </table>
+            </article>
+
+            <article class="panel invoices-list">
+              <h3>Biilal Dhawaan</h3>
+              <div class="invoice-row"><span></span><div><strong>#INV-20492</strong><small>Ali Omar</small></div><b>$450.00</b><em>La bixiyay</em></div>
+              <div class="invoice-row"><span></span><div><strong>#INV-20493</strong><small>Idil Yusuf</small></div><b>$1,200.00</b><em>Sugaya</em></div>
+              <div class="invoice-row"><span></span><div><strong>#INV-20494</strong><small>Sahra Adan</small></div><b>$850.00</b><em class="danger">Daahay</em></div>
+              <button class="muted-btn">Dhammaan Biilasha</button>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="customers">
+          <div class="profile-hero">
+            <div class="photo">Sawir</div>
+            <div><p class="kicker">Xogta Macmiilka</p><h2>Abdirahman Ali</h2><p class="meta">Muqdisho, Soomaaliya · +252 61 555 1234</p></div>
+            <span class="vip">Macmiil Heer Sare</span>
+            <div class="profile-actions"><button class="black-btn">Wax ka beddel Cabbirrada</button><button class="outline-btn">Dalab Cusub</button></div>
+          </div>
+          <div class="profile-grid">
+            <article class="panel measure-card">
+              <div class="panel-title"><h3>Xogta Cabbirka</h3><p>La cusbooneysiiyay: 12 Okt 2023</p></div>
+              <div class="measurements">
+                <div><span>Laab</span><strong>42.5<small>in</small></strong></div><div><span>Garbaha</span><strong>18.0<small>in</small></strong></div><div><span>Dhex</span><strong>36.0<small>in</small></strong></div><div><span>Dherer</span><strong>58.0<small>in</small></strong></div>
+                <div><span>Gacan</span><strong>25.5<small>in</small></strong></div><div><span>Qoorta</span><strong>16.5<small>in</small></strong></div><div><span>Miskaha</span><strong>44.0<small>in</small></strong></div><div><span>Bawdo</span><strong>27.0<small>in</small></strong></div>
+              </div>
+            </article>
+            <article class="panel style-card"><h3>Doorbidka Qaabka</h3><p>"Wuxuu jecel yahay xariir gudaha qoorta iyo gacmaha."</p><p>"Tol laba-jibbaar ah qoorta si uu u adkaado."</p><p>"Jeebab laabta ah ha lagu darin khamiiska haddii aan la codsan."</p><button class="muted-btn">Ku dar Qoraal</button></article>
+            <article class="panel order-history"><div class="panel-title"><h3>Taariikhda Dalabyada</h3><a href="#">Eeg dhammaan</a></div><div class="history-item"><span></span><div><strong>Macawiis Xariir & Khamiis</strong><small>Dalab #ELT-9821 · 24 Okt 2023</small></div><mark>Tolid</mark><b>$450.00</b></div><div class="history-item"><span></span><div><strong>Suud Talyaani ah</strong><small>Dalab #ELT-8762 · 15 Agoosto 2023</small></div><mark class="gray">Dhammaaday</mark><b>$1,200.00</b></div></article>
+            <article class="panel update-card"><h3>Cusbooneysiin Degdeg ah</h3><p>U dir macmiilka fariimo WhatsApp ah oo ku saabsan xaaladda dalabka iyo xusuusinta ballanta.</p><button class="whatsapp-btn">Ogeysii WhatsApp</button></article>
+          </div>
+        </section>
+
+        <section class="view" id="analytics">
+          <div class="page-head"><div><h2>Falanqeynta Dakhliga</h2><p>Raac waxqabadka ganacsiga harqaanka si xirfad leh.</p></div><div class="tabs"><button class="is-active">12 Bilood</button><button>Sannadkan</button><button>Xilli Gaar ah</button></div></div>
+          <div class="analytics-grid">
+            <article class="dark-card"><p>Dakhliga Sanadlaha</p><strong>$482,950</strong><span>+14.2% sannadkii hore</span><div class="progress"><i></i></div><small>88% yoolkii la gaaray</small></article>
+            <article class="panel avg-card"><span class="stat-icon sand"></span><p>Qiimaha Celceliska Dalabka</p><strong>$1,240</strong><hr /><small>Ugu sarreeyay: Nofeembar 2023 <b>$1,580</b></small></article>
+            <article class="panel garment-card"><p>Dharka Ugu Iibka Badan</p><h3>Macawiis Xariir Heer Sare ah</h3><div class="fabric"><span>142 xabo la iibiyay<br />Koror: +22%</span></div></article>
+            <article class="dark-card curve-card"><div class="panel-title"><h3>Kobaca Bil kasta</h3><p>Dakhli iyo saadaal</p></div><svg viewBox="0 0 600 260" aria-hidden="true"><path d="M20 210 C80 170 110 205 160 170 S250 105 300 150 S390 215 430 95 S520 110 570 40" /><path class="fill" d="M20 210 C80 170 110 205 160 170 S250 105 300 150 S390 215 430 95 S520 110 570 40 L570 250 L20 250 Z" /></svg></article>
+            <article class="panel category-card"><h3>Qeybaha Dalabka</h3><div class="abstract-shape"><b>2,410</b><span>Dalab guud</span></div><p><i></i> Suud gaar ah <b>45%</b></p><p><i class="black"></i> Dirac dhaqameed <b>32%</b></p></article>
+            <article class="panel team-card"><div class="panel-title"><div><h3>Waxqabadka Shaqaalaha</h3><p>Waxtar iyo qanacsanaan macmiil.</p></div><a href="#">Warbixin buuxda</a></div><div class="team-list"><div><span>AH</span><strong>Ahmed Hassan</strong><small>Harqaanle Sare</small><b>$128k</b></div><div><span>MA</span><strong>Mohamed Ali</strong><small>Khabiir Dharka ah</small><b>$95k</b></div><div><span>FW</span><strong>Fatima Warsame</strong><small>Sameeye Qaab</small><b>$82k</b></div><div><span>OA</span><strong>Omar Abdi</strong><small>Farsamo-yaqaan Sare</small><b>$74k</b></div></div></article>
+          </div>
+        </section>
+
+        <section class="view" id="orders">
+          <div class="page-head"><div><h2>Raad-raaca Dalabyada</h2><p>Xaaladda dalabyada socda waqtiga-dhabta ah.</p></div><div class="head-actions"><button class="outline-btn">Shaandhee</button><button class="outline-btn">Soo saar</button></div></div>
+          <div class="kanban">
+            <div class="lane"><h3>Cusub <span>3</span></h3><article class="order-card"><small>#ORD-8821</small><h4>Ahmed Hassan</h4><p>Khamiis gaar ah · Linen Talyaani ah</p><footer><span class="mini-avatar navy">JS</span><b>2 maalmood gudahood</b></footer></article><article class="order-card"><small>#ORD-8825</small><h4>Mariam Yusuf</h4><p>Baati aroos · Xariir qurxin leh</p><footer><span class="mini-avatar gold"></span><b>24 Okt</b></footer></article></div>
+            <div class="lane"><h3>Jarid <span>1</span></h3><article class="order-card top-line"><small>#ORD-8812</small><h4>Omar Farah</h4><p>Macawiis qurux badan · Cudbi tayo sare leh</p><footer><span class="mini-avatar photo"></span><b>Berri</b></footer></article></div>
+            <div class="lane"><h3>Tolid <span>4</span></h3><article class="order-card progress-card"><small>#ORD-8790</small><h4>Zahra Warsame</h4><p>Dirac dhammeystiran · Chiffon ballaaran</p><div class="thin-progress"><i></i></div><footer><span class="mini-avatar photo"></span><b>Hanna L.</b></footer></article></div>
+          </div>
+        </section>
+
+                <section class="view" id="measurements">
+          <div class="page-head"><div><p class="kicker" data-measure-breadcrumb>Macaamiil &gt; Abdi Hassan Yusuf</p><h2>Cabbirka Macmiilka</h2></div><div class="head-actions"><button class="outline-btn" data-open-customer>Macmiil Cusub</button><button class="black-btn" data-save-measurements>Keydi Cabbirka</button></div></div>
+          <div class="measurement-workspace">
+            <article class="paper-sheet">
+              <div class="invoice-stamp">GANEEY TAILOR</div>
+              <div class="paper-head">
+                <label>Taariikh:<input data-field="date" placeholder="__/__/____" /></label>
+                <label>Magaca:<input data-field="name" placeholder="Magaca macmiilka" /></label>
+                <label>Tell:<input data-field="phone" placeholder="+252..." /></label>
+              </div>
+              <div class="paper-lines">
+                <label>Waagaga:<input data-field="waaga" /></label>
+                <label>Maalinta:<input data-field="maalinta" /></label>
+                <label>Bixiyey:<input data-field="bixiyey" /></label>
+                <label>Faahfaahin:<input data-field="details" /></label>
+                <label>Haraa:<input data-field="haraa" /></label>
+              </div>
+              <div class="letter-grid" data-letter-grid>
+                <label><span>L</span><input data-measure="Sare L" /></label><label><span>B</span><input data-measure="Sare B" /></label><label><span>P</span><input data-measure="Sare P" /></label><label><span>S</span><input data-measure="Sare S" /></label><label><span>M</span><input data-measure="Sare M" /></label><label><span>K</span><input data-measure="Sare K" /></label><label><span>X</span><input data-measure="Sare X" /></label>
+                <label><span>L</span><input data-measure="Hoose L" /></label><label><span>B</span><input data-measure="Hoose B" /></label><label><span>P</span><input data-measure="Hoose P" /></label><label><span>K</span><input data-measure="Hoose K" /></label><label><span>C</span><input data-measure="Hoose C" /></label><label><span>T</span><input data-measure="Hoose T" /></label><label class="empty-cell"><span></span><input disabled /></label>
+              </div>
+              <div class="signatures">
+                <label>Saxiixa qaataha:<input /></label>
+                <label>Saxiixa bixiyaha:<input /></label>
+              </div>
+            </article>
+            <aside class="panel measurement-side">
+              <h3>Macmiilka Cabbirka</h3>
+              <p data-current-customer>Abdirahman Ali</p>
+              <div class="saved-measures" data-saved-measures></div>
+              <button class="muted-btn" data-clear-measurements>Nadiifi Foomka</button>
+            </aside>
+          </div>
+        </section>
+<section class="view" id="invoices">
+          <div class="page-head"><div><h2>Biilal & Lacag-bixin</h2><p>Maamul lacagaha macmiilka iyo diiwaanka maaliyadda.</p></div><div class="head-actions"><button class="outline-btn">Soo saar Warqad</button><button class="primary-small">Samee Biil Cusub</button></div></div>
+          <div class="billing-grid">
+            <div class="billing-stats"><article class="panel money-card"><p>La bixiyay</p><strong>$12,450</strong></article><article class="panel money-card danger"><p>Daahay</p><strong>$1,280</strong></article><article class="panel collection"><p>Ururinta Bishan</p><strong>$4,820</strong><small>+12.5% bishii hore</small></article></div>
+            <article class="panel transaction-card"><h3>Macamiladii Dhawaa</h3><table><tbody><tr><td>#INV-9821</td><td>Ahmed Hassan</td><td>24 Okt 2023</td><td><b>$450.00</b></td><td><mark>La bixiyay</mark></td></tr><tr><td>#INV-9819</td><td>Muna Farah</td><td>22 Okt 2023</td><td><b>$1,200.00</b></td><td><mark class="sand">Qeyb</mark></td></tr><tr><td>#INV-9815</td><td>Jama Duale</td><td>18 Okt 2023</td><td><b>$850.00</b></td><td><mark class="red">Daahay</mark></td></tr></tbody></table></article>
+            <article class="panel invoice-preview"><h3>BIIL</h3><p>Tixraac: #INV-9821</p><div class="invoice-address"><strong>Waxaa lagu qoray:</strong><b>Ahmed Hassan</b><span>KM4 Area, Hodan<br />+252 61 XXX XXXX</span></div><table><tbody><tr><td>Suud xariir Talyaani ah</td><td>01</td><td>$350.00</td><td>$350.00</td></tr><tr><td>Shaati gacmo Faransiis ah</td><td>02</td><td>$50.00</td><td>$100.00</td></tr></tbody></table><footer><span>Wadar</span><strong>$450.00</strong></footer></article>
+            <aside class="panel payment-panel"><h3>Ficillo Degdeg ah</h3><button class="black-btn">Daabac Biil</button><button class="whatsapp-btn">WhatsApp Biil</button><button class="outline-btn">Iimayl PDF</button><h3>Hababka Lacagta</h3><div class="pay-method active">Zaad Service<small>Lacag moobil Telesom</small></div><div class="pay-method">EVC Plus<small>Lacag moobil Hormuud</small></div><div class="pay-method">Caddaan<small>Lacag gacanta ah</small></div><div class="pay-method">Sahal<small>Lacag moobil Golis</small></div></aside>
+          </div>
+        </section>
+      </main>
+      <button class="fab">+</button>
+    </div>
+
+    <div class="modal" data-customer-modal aria-hidden="true">
+      <form class="modal-card" data-customer-form>
+        <button class="modal-close" type="button" data-close-customer aria-label="Xir">x</button>
+        <p class="kicker">Macmiil Cusub</p>
+        <h2>Ku dar macmiil cusub</h2>
+        <div class="form-grid">
+          <label>Magaca<input name="name" required placeholder="Tusaale: Ahmed Hassan" /></label>
+          <label>Telefoon<input name="phone" required placeholder="+252 61..." /></label>
+          <label>Magaalo<input name="city" value="Muqdisho" /></label>
+          <label>Nooca dharka<input name="garment" placeholder="Khamiis, Suud, Dirac..." /></label>
+        </div>
+        <label>Qoraal<textarea name="note" rows="3" placeholder="Faahfaahin kooban..."></textarea></label>
+        <p class="form-status" data-form-status></p>
+        <div class="modal-actions"><button class="outline-btn" type="button" data-close-customer>Jooji</button><button class="black-btn" type="submit">Keydi Macmiil</button></div>
+      </form>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
