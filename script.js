@@ -12,6 +12,13 @@ const measureBreadcrumb = document.querySelector("[data-measure-breadcrumb]");
 const savedMeasures = document.querySelector("[data-saved-measures]");
 const searchInput = document.querySelector(".search input");
 const syncStatus = document.querySelector("[data-sync-status]");
+const recentInvoices = document.querySelector("[data-recent-invoices]");
+const ordersBoard = document.querySelector("[data-orders-board]");
+const invoiceTable = document.querySelector("[data-invoice-table]");
+const invoicePreview = document.querySelector("[data-invoice-preview]");
+const profileMeasures = document.querySelector("[data-profile-measures]");
+const styleNotes = document.querySelector("[data-style-notes]");
+const orderHistory = document.querySelector("[data-order-history]");
 
 const supabaseConfig = {
   url: "https://tfsxyxmbueosgfkwfnqq.supabase.co",
@@ -30,6 +37,8 @@ const keys = {
   customers: "somali-tailor-customers",
   measurements: "somali-tailor-measurements",
   notes: "somali-tailor-notes",
+  orders: "somali-tailor-orders",
+  invoices: "somali-tailor-invoices",
   settings: "somali-tailor-settings",
   selectedPayment: "somali-tailor-payment",
 };
@@ -37,6 +46,19 @@ const keys = {
 const defaultCustomers = [
   { name: "Ahmed Hassan", phone: "+252 61 555 1001", city: "Muqdisho", garment: "Suud Aroos", note: "" },
   { name: "Muna Farah", phone: "+252 61 555 1002", city: "Hargeysa", garment: "Dharka Habeenka", note: "" },
+];
+
+const defaultOrders = [
+  { id: "ORD-8821", customer: "Ahmed Hassan", garment: "Khamiis gaar ah", fabric: "Linen Talyaani ah", status: "Cusub", due: "2 maalmood gudahood", amount: 450 },
+  { id: "ORD-8825", customer: "Mariam Yusuf", garment: "Baati aroos", fabric: "Xariir qurxin leh", status: "Cusub", due: "24 Okt", amount: 620 },
+  { id: "ORD-8812", customer: "Omar Farah", garment: "Macawiis qurux badan", fabric: "Cudbi tayo sare leh", status: "Jarid", due: "Berri", amount: 280 },
+  { id: "ORD-8790", customer: "Zahra Warsame", garment: "Dirac dhammeystiran", fabric: "Chiffon ballaaran", status: "Tolid", due: "Hanna L.", amount: 850 },
+];
+
+const defaultInvoices = [
+  { id: "INV-9821", customer: "Ahmed Hassan", date: "24 Okt 2023", amount: 450, status: "La bixiyay", items: [{ name: "Suud xariir Talyaani ah", qty: 1, price: 350 }, { name: "Shaati gacmo Faransiis ah", qty: 2, price: 50 }] },
+  { id: "INV-9819", customer: "Muna Farah", date: "22 Okt 2023", amount: 1200, status: "Qeyb", items: [{ name: "Dharka Habeenka", qty: 1, price: 1200 }] },
+  { id: "INV-9815", customer: "Jama Duale", date: "18 Okt 2023", amount: 850, status: "Daahay", items: [{ name: "Khamiis gaar ah", qty: 1, price: 850 }] },
 ];
 
 const readStore = (key, fallback) => {
@@ -86,6 +108,8 @@ const writeStore = (key, value) => {
 let customers = readStore(keys.customers, defaultCustomers);
 let measurements = readStore(keys.measurements, {});
 let notes = readStore(keys.notes, []);
+let orders = readStore(keys.orders, defaultOrders);
+let invoices = readStore(keys.invoices, defaultInvoices);
 let settings = readStore(keys.settings, {
   businessName: "Ganeey Tailor",
   businessPhone: "+252 61 XXX XXXX",
@@ -132,7 +156,10 @@ const loadSupabaseState = async () => {
   customers = remote[keys.customers] || customers;
   measurements = remote[keys.measurements] || measurements;
   notes = remote[keys.notes] || notes;
+  orders = remote[keys.orders] || orders;
+  invoices = remote[keys.invoices] || invoices;
   settings = remote[keys.settings] || settings;
+  selectedCustomer = customers[0];
 
   Object.entries(remote).forEach(([key, value]) => {
     localStorage.setItem(key, JSON.stringify(value));
@@ -140,6 +167,21 @@ const loadSupabaseState = async () => {
 
   supabaseReady = true;
   setSyncStatus("Supabase wuu xiran yahay. Xogta database-ka ayaa la isticmaalayaa.");
+
+  if (!data?.length) {
+    syncAllState();
+    setSyncStatus("Supabase wuu xiran yahay. Xogtii bilowga ahayd waa la diray.");
+  }
+};
+
+const syncAllState = () => {
+  writeStore(keys.customers, customers);
+  writeStore(keys.measurements, measurements);
+  writeStore(keys.notes, notes);
+  writeStore(keys.orders, orders);
+  writeStore(keys.invoices, invoices);
+  writeStore(keys.settings, settings);
+  writeStore(keys.selectedPayment, readStore(keys.selectedPayment, "Zaad Service"));
 };
 
 const openActionModal = (title, body, kicker = "Nidaam") => {
@@ -206,6 +248,97 @@ const renderCustomers = (query = "") => {
     : `<tr><td colspan="4">Natiijo lama helin.</td></tr>`;
 };
 
+const money = (amount) => `${settings.currency || "USD"} ${Number(amount || 0).toLocaleString()}`;
+
+const renderStats = () => {
+  document.querySelector("[data-stat-orders]").textContent = orders.length;
+  document.querySelector("[data-stat-pending]").textContent = orders.filter((order) => order.status !== "Dhammaaday").length;
+  document.querySelector("[data-stat-done]").textContent = orders.filter((order) => order.status === "Dhammaaday").length;
+  document.querySelector("[data-stat-revenue]").textContent = money(invoices.reduce((sum, invoice) => sum + Number(invoice.amount || 0), 0));
+};
+
+const renderProfile = () => {
+  const customer = selectedCustomer || customers[0];
+  if (!customer) return;
+
+  document.querySelector("[data-profile-initials]").textContent = initials(customer.name);
+  document.querySelector("[data-profile-name]").textContent = customer.name;
+  document.querySelector("[data-profile-meta]").textContent = `${customer.city || "Muqdisho"}, Soomaaliya · ${customer.phone || "Telefoon lama hayo"}`;
+
+  const saved = measurements[customer.phone]?.measures || {};
+  const measureEntries = Object.entries(saved).slice(0, 8);
+  profileMeasures.innerHTML = measureEntries.length
+    ? measureEntries.map(([label, value]) => `<div><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}<small>in</small></strong></div>`).join("")
+    : `<div><span>Cabbir</span><strong>0<small>in</small></strong></div><div><span>Status</span><strong>New</strong></div>`;
+
+  const customerNotes = notes.filter((note) => note.customer === customer.name).slice(0, 3);
+  styleNotes.innerHTML = customerNotes.length
+    ? customerNotes.map((note) => `<p>"${escapeHtml(note.note)}"</p>`).join("")
+    : `<p>"Qoraallo gaar ah weli lama keydin."</p><p>"Ku dar qoraal si uu ugu xirmo macmiilkan."</p>`;
+
+  const history = orders.filter((order) => order.customer === customer.name).slice(0, 4);
+  orderHistory.innerHTML = history.length
+    ? history
+        .map(
+          (order) =>
+            `<div class="history-item"><span></span><div><strong>${escapeHtml(order.garment)}</strong><small>Dalab #${escapeHtml(order.id)} · ${escapeHtml(order.due)}</small></div><mark>${escapeHtml(order.status)}</mark><b>${money(order.amount)}</b></div>`
+        )
+        .join("")
+    : `<div class="history-item"><span></span><div><strong>Dalab ma jiro</strong><small>Dalab cusub samee si uu halkan uga muuqdo</small></div><mark class="gray">Cusub</mark><b>${money(0)}</b></div>`;
+};
+
+const renderOrders = () => {
+  const lanes = ["Cusub", "Jarid", "Tolid", "Dhammaaday"];
+  ordersBoard.innerHTML = lanes
+    .map((lane) => {
+      const laneOrders = orders.filter((order) => order.status === lane);
+      const cards = laneOrders.length
+        ? laneOrders
+            .map(
+              (order) =>
+                `<article class="order-card ${lane === "Jarid" ? "top-line" : ""}" data-order-id="${escapeHtml(order.id)}"><small>#${escapeHtml(order.id)}</small><h4>${escapeHtml(order.customer)}</h4><p>${escapeHtml(order.garment)} · ${escapeHtml(order.fabric || "Faahfaahin")}</p><footer><span class="mini-avatar navy">${initials(order.customer)}</span><b>${escapeHtml(order.due || "Maanta")}</b></footer></article>`
+            )
+            .join("")
+        : `<article class="order-card"><small>${lane}</small><h4>Wax dalab ah ma jiro</h4><p>Dalab cusub ayaa halkan ka muuqan doona.</p></article>`;
+
+      return `<div class="lane"><h3>${lane} <span>${laneOrders.length}</span></h3>${cards}</div>`;
+    })
+    .join("");
+};
+
+const renderInvoices = () => {
+  if (!invoices.length) {
+    recentInvoices.innerHTML = `<small>Biilal weli lama keydin.</small>`;
+    invoiceTable.innerHTML = `<tr><td colspan="5">Biilal weli lama keydin.</td></tr>`;
+    invoicePreview.innerHTML = `<h3>BIIL</h3><p>Biil cusub samee si preview-gu u muuqdo.</p>`;
+    return;
+  }
+
+  recentInvoices.innerHTML = invoices
+    .slice(0, 3)
+    .map((invoice) => `<div class="invoice-row"><span></span><div><strong>#${escapeHtml(invoice.id)}</strong><small>${escapeHtml(invoice.customer)}</small></div><b>${money(invoice.amount)}</b><em>${escapeHtml(invoice.status)}</em></div>`)
+    .join("");
+
+  invoiceTable.innerHTML = invoices
+    .map((invoice) => `<tr><td>#${escapeHtml(invoice.id)}</td><td>${escapeHtml(invoice.customer)}</td><td>${escapeHtml(invoice.date)}</td><td><b>${money(invoice.amount)}</b></td><td><mark>${escapeHtml(invoice.status)}</mark></td></tr>`)
+    .join("");
+
+  const invoice = invoices[0];
+  const items = invoice.items || [{ name: "Adeeg harqaan", qty: 1, price: invoice.amount }];
+  invoicePreview.innerHTML = `<h3>BIIL</h3><p>Tixraac: #${escapeHtml(invoice.id)}</p><div class="invoice-address"><strong>Waxaa lagu qoray:</strong><b>${escapeHtml(invoice.customer)}</b><span>${escapeHtml(settings.businessCity || "Muqdisho")}<br />${escapeHtml(settings.businessPhone || "")}</span></div><table><tbody>${items
+    .map((item) => `<tr><td>${escapeHtml(item.name)}</td><td>${item.qty}</td><td>${money(item.price)}</td><td>${money(Number(item.qty || 1) * Number(item.price || 0))}</td></tr>`)
+    .join("")}</tbody></table><footer><span>Wadar</span><strong>${money(invoice.amount)}</strong></footer>`;
+};
+
+const renderAll = () => {
+  renderCustomers(searchInput.value);
+  renderSavedMeasures();
+  renderStats();
+  renderProfile();
+  renderOrders();
+  renderInvoices();
+};
+
 const fillMeasurementForm = (customer) => {
   const saved = measurements[customer.phone] || {};
   document.querySelector('[data-field="date"]').value = saved.date || today();
@@ -230,6 +363,7 @@ const selectCustomer = (customer) => {
   currentCustomer.textContent = customer.name;
   measureBreadcrumb.textContent = `Macaamiil > ${customer.name}`;
   fillMeasurementForm(customer);
+  renderProfile();
   showView("measurements");
 };
 
@@ -265,10 +399,19 @@ const saveMeasurements = () => {
   });
 
   measurements[customerPhone] = { date: fields.date || today(), fields, measures };
+  const existingCustomer = customers.find((customer) => customer.phone === customerPhone);
+  if (existingCustomer) {
+    existingCustomer.name = customerName;
+    existingCustomer.city = fields.city || existingCustomer.city;
+  } else {
+    customers.unshift({ name: customerName, phone: customerPhone, city: settings.businessCity, garment: fields.details || "Macmiil cusub", note: "" });
+    selectedCustomer = customers[0];
+    writeStore(keys.customers, customers);
+  }
+
   writeStore(keys.measurements, measurements);
-  renderSavedMeasures({ phone: customerPhone });
-  renderCustomers(searchInput.value);
-  openActionModal("Cabbirka waa la keydiyay", `${customerName} cabbirkiisa wuxuu ku kaydsan yahay browser-ka.`, "Cabbirro");
+  renderAll();
+  openActionModal("Cabbirka waa la keydiyay", `${customerName} cabbirkiisa waa la keydiyay oo shaashadda waa la cusbooneysiiyay.`, "Cabbirro");
 };
 
 const downloadFile = (filename, content, type = "text/plain") => {
@@ -295,12 +438,39 @@ const exportReport = (filename = "ganeey-report.txt") => {
 };
 
 const createQuickOrder = () => {
-  openActionModal("Dalab cusub", "Dalab cusub ayaa diyaar u ah in lala xiriiriyo macmiilka hadda. Supabase ka dib wuxuu noqon doonaa record rasmi ah.", "Dalabyo");
+  const customer = selectedCustomer || customers[0];
+  const order = {
+    id: `ORD-${Date.now().toString().slice(-5)}`,
+    customer: customer?.name || "Macmiil cusub",
+    garment: customer?.garment || "Dalab cusub",
+    fabric: "Faahfaahin cusub",
+    status: "Cusub",
+    due: today(),
+    amount: 0,
+  };
+
+  orders.unshift(order);
+  writeStore(keys.orders, orders);
+  renderAll();
+  openActionModal("Dalab cusub", `Dalab #${order.id} waa la keydiyay.`, "Dalabyo");
   showView("orders");
 };
 
 const createInvoice = () => {
-  openActionModal("Biil cusub", "Biil cusub ayaa la diyaariyay. Hadda wuxuu ku shaqeynayaa preview; Supabase kadib waa la kaydin doonaa.", "Biilal");
+  const customer = selectedCustomer || customers[0];
+  const invoice = {
+    id: `INV-${Date.now().toString().slice(-5)}`,
+    customer: customer?.name || "Macmiil cusub",
+    date: today(),
+    amount: 0,
+    status: "Sugaya",
+    items: [{ name: customer?.garment || "Adeeg harqaan", qty: 1, price: 0 }],
+  };
+
+  invoices.unshift(invoice);
+  writeStore(keys.invoices, invoices);
+  renderAll();
+  openActionModal("Biil cusub", `Biil #${invoice.id} waa la keydiyay.`, "Biilal");
   showView("invoices");
 };
 
@@ -309,6 +479,7 @@ const saveSettings = () => {
   settings[input.dataset.setting] = input.value.trim();
   });
   writeStore(keys.settings, settings);
+  renderAll();
   openActionModal("Dejinta waa la keydiyay", supabaseReady ? "Macluumaadka ganacsiga waxaa lagu kaydiyay Supabase." : "Macluumaadka ganacsiga waa la kaydiyay browser-ka. Supabase table-ka hubi.", "Dejin");
 };
 
@@ -317,7 +488,8 @@ const addNote = () => {
   if (!note?.trim()) return;
   notes.unshift({ customer: selectedCustomer?.name || "Macmiil", note: note.trim(), date: today() });
   writeStore(keys.notes, notes);
-  openActionModal("Qoraal waa la keydiyay", "Qoraalka cusub waa la kaydiyay browser-ka.", "Qoraal");
+  renderAll();
+  openActionModal("Qoraal waa la keydiyay", "Qoraalka cusub waa la kaydiyay oo profile-ka ayuu ka muuqdaa.", "Qoraal");
 };
 
 const wireActions = () => {
@@ -365,8 +537,9 @@ const wireActions = () => {
     }
 
     customers.unshift(customer);
+    selectedCustomer = customer;
     writeStore(keys.customers, customers);
-    renderCustomers(searchInput.value);
+    renderAll();
     customerForm.reset();
     closeCustomerModal();
     selectCustomer(customer);
@@ -389,6 +562,18 @@ const wireActions = () => {
       input.value = "";
     });
     savedMeasures.innerHTML = "<small>Foomka waa la nadiifiyay.</small>";
+  });
+
+  ordersBoard.addEventListener("click", (event) => {
+    const card = event.target.closest(".order-card");
+    if (!card) return;
+    const order = orders.find((item) => item.id === card.dataset.orderId);
+    openActionModal("Faahfaahinta dalabka", order ? `${order.customer}: ${order.garment}, ${order.status}, ${money(order.amount)}.` : "Faahfaahinta dalabkan waa la furay.", "Dalab");
+  });
+
+  orderHistory.addEventListener("click", (event) => {
+    if (!event.target.closest(".history-item")) return;
+    showView("orders");
   });
 
   document.querySelectorAll("[data-new-order]").forEach((button) => button.addEventListener("click", createQuickOrder));
@@ -441,12 +626,9 @@ const wireActions = () => {
       document.querySelectorAll(".pay-method").forEach((item) => item.classList.remove("active"));
       method.classList.add("active");
       writeStore(keys.selectedPayment, method.dataset.payMethod);
+      renderStats();
       openActionModal("Habka lacagta", `${method.dataset.payMethod} ayaa la doortay.`, "Lacag-bixin");
     });
-  });
-
-  document.querySelectorAll(".order-card, .history-item").forEach((card) => {
-    card.addEventListener("click", () => openActionModal("Faahfaahinta dalabka", "Faahfaahinta dalabkan waa la furay. Kaydin buuxda waxay imaaneysaa marka Supabase la xiro.", "Dalab"));
   });
 
   document.querySelectorAll(".sidebar-bottom a").forEach((link) => {
@@ -481,8 +663,7 @@ const init = async () => {
     method.classList.toggle("active", method.dataset.payMethod === selectedPayment);
   });
 
-  renderCustomers();
-  renderSavedMeasures();
+  renderAll();
   wireActions();
 };
 
