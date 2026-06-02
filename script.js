@@ -11,6 +11,20 @@ const currentCustomer = document.querySelector("[data-current-customer]");
 const measureBreadcrumb = document.querySelector("[data-measure-breadcrumb]");
 const savedMeasures = document.querySelector("[data-saved-measures]");
 const searchInput = document.querySelector(".search input");
+const syncStatus = document.querySelector("[data-sync-status]");
+
+const supabaseConfig = {
+  url: "https://tfsxyxmbueosgfkwfnqq.supabase.co",
+  anonKey:
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmc3h5eG1idWVvc2dma3dmbnFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MDQyNDYsImV4cCI6MjA5NTk4MDI0Nn0.0zjZGnbdY-dPZReHXkeCyxO25rNoFKlxTVli7aKLxoU",
+};
+
+const supabaseClient =
+  window.supabase?.createClient?.(supabaseConfig.url, supabaseConfig.anonKey, {
+    auth: { persistSession: false },
+  }) || null;
+
+let supabaseReady = false;
 
 const keys = {
   customers: "somali-tailor-customers",
@@ -33,19 +47,46 @@ const readStore = (key, fallback) => {
   }
 };
 
+const setSyncStatus = (message) => {
+  if (syncStatus) syncStatus.textContent = message;
+};
+
+const syncStore = async (key, value) => {
+  if (!supabaseClient) return false;
+
+  const { error } = await supabaseClient.from("app_state").upsert({
+    key,
+    value,
+    updated_at: new Date().toISOString(),
+  });
+
+  if (error) {
+    supabaseReady = false;
+    setSyncStatus("Supabase lama kaydin karo weli. Hubi in table-ka app_state iyo policies la sameeyay.");
+    console.warn("Supabase sync failed:", error.message);
+    return false;
+  }
+
+  supabaseReady = true;
+  setSyncStatus("Supabase wuu xiran yahay. Xogta browser-ka iyo database-ka waa la wada keydinayaa.");
+  return true;
+};
+
 const writeStore = (key, value) => {
   try {
     localStorage.setItem(key, JSON.stringify(value));
+    syncStore(key, value);
     return true;
   } catch {
+    syncStore(key, value);
     return false;
   }
 };
 
-const customers = readStore(keys.customers, defaultCustomers);
-const measurements = readStore(keys.measurements, {});
-const notes = readStore(keys.notes, []);
-const settings = readStore(keys.settings, {
+let customers = readStore(keys.customers, defaultCustomers);
+let measurements = readStore(keys.measurements, {});
+let notes = readStore(keys.notes, []);
+let settings = readStore(keys.settings, {
   businessName: "Ganeey Tailor",
   businessPhone: "+252 61 XXX XXXX",
   businessCity: "Muqdisho",
@@ -71,6 +112,35 @@ const initials = (name) =>
     .toUpperCase();
 
 const today = () => new Date().toLocaleDateString("so-SO", { day: "2-digit", month: "short", year: "numeric" });
+
+const loadSupabaseState = async () => {
+  if (!supabaseClient) {
+    setSyncStatus("Supabase client lama helin. Xogta waxay ku kaydsan tahay browser-ka.");
+    return;
+  }
+
+  const { data, error } = await supabaseClient.from("app_state").select("key,value");
+
+  if (error) {
+    supabaseReady = false;
+    setSyncStatus("Supabase table weli lama diyaarin. Isticmaal supabase-schema.sql kadib refresh garee.");
+    console.warn("Supabase load failed:", error.message);
+    return;
+  }
+
+  const remote = Object.fromEntries((data || []).map((row) => [row.key, row.value]));
+  customers = remote[keys.customers] || customers;
+  measurements = remote[keys.measurements] || measurements;
+  notes = remote[keys.notes] || notes;
+  settings = remote[keys.settings] || settings;
+
+  Object.entries(remote).forEach(([key, value]) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  });
+
+  supabaseReady = true;
+  setSyncStatus("Supabase wuu xiran yahay. Xogta database-ka ayaa la isticmaalayaa.");
+};
 
 const openActionModal = (title, body, kicker = "Nidaam") => {
   actionModal.querySelector("[data-action-kicker]").textContent = kicker;
@@ -236,10 +306,10 @@ const createInvoice = () => {
 
 const saveSettings = () => {
   document.querySelectorAll("[data-setting]").forEach((input) => {
-    settings[input.dataset.setting] = input.value.trim();
+  settings[input.dataset.setting] = input.value.trim();
   });
   writeStore(keys.settings, settings);
-  openActionModal("Dejinta waa la keydiyay", "Macluumaadka ganacsiga waa la kaydiyay.", "Dejin");
+  openActionModal("Dejinta waa la keydiyay", supabaseReady ? "Macluumaadka ganacsiga waxaa lagu kaydiyay Supabase." : "Macluumaadka ganacsiga waa la kaydiyay browser-ka. Supabase table-ka hubi.", "Dejin");
 };
 
 const addNote = () => {
@@ -343,7 +413,15 @@ const wireActions = () => {
   document.querySelector("[data-show-invoices]").addEventListener("click", () => showView("invoices"));
   document.querySelector("[data-filter-orders]").addEventListener("click", () => openActionModal("Shaandheynta", "Dalabyada muhiimka ah iyo kuwa maanta ku eg ayaa la muujiyay.", "Dalabyo"));
   document.querySelector("[data-save-settings]").addEventListener("click", saveSettings);
-  document.querySelector("[data-system-status]").addEventListener("click", () => openActionModal("Xaaladda Nidaamka", "Local save wuu shaqeynayaa. Supabase weli lama xirin.", "Status"));
+  document.querySelector("[data-system-status]").addEventListener("click", () =>
+    openActionModal(
+      "Xaaladda Nidaamka",
+      supabaseReady
+        ? "Supabase wuu shaqeynayaa. Customers, measurements, notes, settings, iyo payment method waa la sync gareynayaa."
+        : "Local save wuu shaqeynayaa. Supabase wuxuu u baahan yahay table-ka app_state iyo policies.",
+      "Status"
+    )
+  );
   document.querySelector("[data-cycle-period]").addEventListener("click", (event) => {
     const periods = ["Bishan", "Toddobaadkan", "Sannadkan"];
     const next = periods[(periods.indexOf(event.currentTarget.textContent) + 1) % periods.length];
@@ -391,7 +469,9 @@ const wireActions = () => {
   });
 };
 
-const init = () => {
+const init = async () => {
+  await loadSupabaseState();
+
   document.querySelectorAll("[data-setting]").forEach((input) => {
     input.value = settings[input.dataset.setting] || input.value;
   });
