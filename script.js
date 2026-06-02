@@ -12,6 +12,12 @@ const savedMeasures = document.querySelector("[data-saved-measures]");
 const authStatus = document.querySelector("[data-auth-status]");
 const userPill = document.querySelector("[data-user-pill]");
 const syncStatus = document.querySelector("[data-sync-status]");
+const customerDirectory = document.querySelector("[data-customer-directory]");
+const profileInitials = document.querySelector("[data-profile-initials]");
+const profileName = document.querySelector("[data-profile-name]");
+const profileMeta = document.querySelector("[data-profile-meta]");
+const profileMeasures = document.querySelector("[data-profile-measures]");
+const profileMeasureDate = document.querySelector("[data-profile-measure-date]");
 
 const supabaseConfig = {
   url: "https://tfsxyxmbueosgfkwfnqq.supabase.co",
@@ -32,6 +38,8 @@ let measurements = {};
 let selectedCustomer = null;
 let currentUser = null;
 let supabaseReady = false;
+
+const fakeCustomerNames = new Set(["Ahmed Hassan", "Muna Farah"]);
 
 const readJson = (key, fallback) => {
   try {
@@ -192,7 +200,7 @@ const syncAllState = async () => {
 };
 
 const loadSupabaseState = async () => {
-  customers = readJson(keys.customers, defaultCustomers);
+  customers = sanitizeCustomers(readJson(keys.customers, defaultCustomers));
   measurements = readJson(keys.measurements, {});
 
   if (!currentUser?.id) {
@@ -217,7 +225,7 @@ const loadSupabaseState = async () => {
   }
 
   const remote = Object.fromEntries((data || []).map((row) => [row.key, row.value]));
-  customers = remote[keys.customers] || customers;
+  customers = sanitizeCustomers(remote[keys.customers] || customers);
   measurements = remote[keys.measurements] || measurements;
   writeJson(keys.customers, customers);
   writeJson(keys.measurements, measurements);
@@ -318,6 +326,16 @@ const escapeHtml = (value) =>
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
+const sanitizeCustomers = (items) =>
+  (Array.isArray(items) ? items : []).filter(
+    (customer) => customer?.name && !String(customer.id || "").startsWith("sample-") && !fakeCustomerNames.has(customer.name)
+  );
+
+const formatDateTime = (value) => {
+  if (!value) return "Weli lama cusbooneysiin";
+  return new Date(value).toLocaleDateString("so-SO", { day: "2-digit", month: "short", year: "numeric" });
+};
+
 const openCustomerModal = () => {
   modal.classList.add("is-open");
   modal.setAttribute("aria-hidden", "false");
@@ -335,8 +353,19 @@ const selectCustomer = (customer) => {
   measureBreadcrumb.textContent = `Macaamiil > ${customer.name}`;
   document.querySelector('[data-field="name"]').value = customer.name;
   document.querySelector('[data-field="phone"]').value = customer.phone;
+  renderProfile();
   renderSavedMeasurements();
   showView("measurements");
+};
+
+const selectCustomerProfile = (customer) => {
+  selectedCustomer = customer;
+  document.querySelector('[data-field="name"]').value = customer.name;
+  document.querySelector('[data-field="phone"]').value = customer.phone;
+  currentCustomer.textContent = customer.name;
+  measureBreadcrumb.textContent = `Macaamiil > ${customer.name}`;
+  renderAll();
+  showView("customers");
 };
 
 const renderCustomers = () => {
@@ -359,6 +388,71 @@ const renderCustomers = () => {
         </tr>`
     )
     .join("");
+};
+
+const renderCustomerDirectory = () => {
+  if (!customerDirectory) return;
+
+  if (!customers.length) {
+    customerDirectory.innerHTML = '<div class="empty-state">Weli macmiil lama gelin. Macmiil cusub ku dar si uu halkan uga muuqdo.</div>';
+    return;
+  }
+
+  customerDirectory.innerHTML = `
+    <div class="customer-directory">
+      ${customers
+        .map(
+          (customer, index) => `
+            <button class="customer-row ${selectedCustomer?.id === customer.id ? "is-active" : ""}" type="button" data-profile-customer="${index}">
+              <span class="mini-avatar ${index % 2 ? "gold" : "navy"}">${initials(customer.name)}</span>
+              <span><strong>${escapeHtml(customer.name)}</strong><small>${escapeHtml(customer.phone || "Telefoon lama gelin")} · ${escapeHtml(customer.city || "Magaalo lama gelin")}</small></span>
+              <em>${escapeHtml(customer.garment || "Nooca dharka lama gelin")}</em>
+            </button>`
+        )
+        .join("")}
+    </div>`;
+};
+
+const renderProfile = () => {
+  const customer = selectedCustomer;
+  const record = customer ? measurements[customer.id] : null;
+  const values = record?.values || {};
+  const measureAliases = {
+    Laab: ["Laab", "Sare B"],
+    Garbaha: ["Garbaha", "Sare S"],
+    Dhex: ["Dhex", "Hoose B"],
+    Dherer: ["Dherer", "Sare L"],
+    Gacan: ["Gacan", "Sare G"],
+    Qoorta: ["Qoorta", "Sare K"],
+    Miskaha: ["Miskaha", "Hoose K"],
+    Bawdo: ["Bawdo", "Hoose C"],
+  };
+
+  if (!customer) {
+    if (profileInitials) profileInitials.textContent = "Sawir";
+    if (profileName) profileName.textContent = "Macmiil lama dooran";
+    if (profileMeta) profileMeta.textContent = "Ku dar macmiil si xog dhab ah uga muuqato halkan.";
+    if (profileMeasureDate) profileMeasureDate.textContent = "Weli lama cusbooneysiin";
+    if (profileMeasures) {
+      profileMeasures.innerHTML = Object.keys(measureAliases)
+        .map((label) => `<div><span>${label}</span><strong>0<small>in</small></strong></div>`)
+        .join("");
+    }
+    return;
+  }
+
+  if (profileInitials) profileInitials.textContent = initials(customer.name);
+  if (profileName) profileName.textContent = customer.name;
+  if (profileMeta) profileMeta.textContent = `${customer.city || "Magaalo lama gelin"} · ${customer.phone || "Telefoon lama gelin"}`;
+  if (profileMeasureDate) profileMeasureDate.textContent = record?.updatedAt ? `La cusbooneysiiyay: ${formatDateTime(record.updatedAt)}` : "Weli lama cusbooneysiin";
+  if (profileMeasures) {
+    profileMeasures.innerHTML = Object.entries(measureAliases)
+      .map(([label, aliases]) => {
+        const value = aliases.map((name) => values[name]).find(Boolean) || "0";
+        return `<div><span>${label}</span><strong>${escapeHtml(value)}<small>in</small></strong></div>`;
+      })
+      .join("");
+  }
 };
 
 const collectMeasurementRecord = () => {
@@ -395,6 +489,8 @@ const renderSavedMeasurements = () => {
 const renderAll = () => {
   selectedCustomer = selectedCustomer || customers[0];
   renderCustomers();
+  renderCustomerDirectory();
+  renderProfile();
   if (selectedCustomer) {
     currentCustomer.textContent = selectedCustomer.name;
     measureBreadcrumb.textContent = `Macaamiil > ${selectedCustomer.name}`;
@@ -481,13 +577,27 @@ customerForm.addEventListener("submit", async (event) => {
   formStatus.textContent = saved ? "Macmiilka Supabase ayaa lagu keydiyay." : "Macmiilka browser-ka ayuu ku keydsan yahay; Supabase wuu fashilmay.";
   customerForm.reset();
   closeCustomerModal();
-  selectCustomer(customer);
+  selectCustomerProfile(customer);
 });
 
 customersTable.addEventListener("click", (event) => {
   const button = event.target.closest("[data-select-customer]");
   if (!button) return;
   selectCustomer(customers[Number(button.dataset.selectCustomer)]);
+});
+
+customerDirectory?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-profile-customer]");
+  if (!button) return;
+  selectCustomerProfile(customers[Number(button.dataset.profileCustomer)]);
+});
+
+document.querySelector("[data-edit-profile-measures]")?.addEventListener("click", () => {
+  if (!selectedCustomer) {
+    openCustomerModal();
+    return;
+  }
+  selectCustomer(selectedCustomer);
 });
 
 document.querySelector("[data-save-measurements]").addEventListener("click", async () => {
@@ -498,6 +608,7 @@ document.querySelector("[data-save-measurements]").addEventListener("click", asy
 
   const record = collectMeasurementRecord();
   measurements[record.customerId] = record;
+  renderProfile();
   renderSavedMeasurements();
   const saved = await syncStore(keys.measurements, measurements);
   savedMeasures.insertAdjacentHTML(
