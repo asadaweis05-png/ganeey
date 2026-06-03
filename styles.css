@@ -1625,9 +1625,17 @@ blockquote {
   margin: 18px 0;
 }
 
+.modal-measure-block.paper-sheet {
+  min-height: auto;
+  padding: 30px;
+  box-shadow: none;
+}
+
 .modal-measure-block h3 {
   margin: 0;
   font-size: 1rem;
+  color: #254f9b;
+  font-weight: 800;
 }
 
 .modal-lines {
