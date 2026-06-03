@@ -202,7 +202,7 @@
                 <label>Haraa:<input data-field="haraa" placeholder="$0" /></label>
               </div>
               <div class="letter-grid" data-letter-grid>
-                <label><span>L</span><input data-measure="Sare L" /></label><label><span>B</span><input data-measure="Sare B" /></label><label><span>P</span><input data-measure="Sare P" /></label><label><span>S</span><input data-measure="Sare S" /></label><label><span>M</span><input data-measure="Sare M" /></label><label><span>K</span><input data-measure="Sare K" /></label><label><span>X</span><input data-measure="Sare X" /></label><label><span>G</span><input data-measure="Sare G" /></label><label><span>X</span><input data-measure="Sare X 2" /></label>
+                <label><span>L</span><input data-measure="Sare L" /></label><label><span>B</span><input data-measure="Sare B" /></label><label><span>P</span><input data-measure="Sare P" /></label><label><span>S</span><input data-measure="Sare S" /></label><label><span>M</span><input data-measure="Sare M" /></label><label><span>K</span><input data-measure="Sare K" /></label><label><span>X</span><input data-measure="Sare X" /></label><label><span>X</span><input data-measure="Sare X 2" /></label><label><span>G</span><input data-measure="Sare G" /></label>
                 <label><span>L</span><input data-measure="Hoose L" /></label><label><span>B</span><input data-measure="Hoose B" /></label><label><span>P</span><input data-measure="Hoose P" /></label><label><span>K</span><input data-measure="Hoose K" /></label><label><span>C</span><input data-measure="Hoose C" /></label><label><span>T</span><input data-measure="Hoose T" /></label><label class="empty-cell"><span></span><input disabled /></label><label class="empty-cell"><span></span><input disabled /></label><label class="empty-cell"><span></span><input disabled /></label>
               </div>
               <div class="signatures">
@@ -240,9 +240,24 @@
           <label>Magaca<input name="name" required placeholder="Magaca macmiilka" /></label>
           <label>Telefoon<input name="phone" required placeholder="+252 61..." /></label>
           <label>Magaalo<input name="city" placeholder="Magaalada" /></label>
-          <label>Nooca dharka<input name="garment" placeholder="Khamiis, Suud, Dirac..." /></label>
+          <label>Nooca dharka<select name="garment" required><option value="">Dooro nooca</option><option value="shaati">Shaati</option><option value="sarwaal">Sarwaal</option><option value="khamiis">Khamiis</option></select></label>
           <label>Bixiyey<input name="bixiyey" placeholder="$0" /></label>
           <label>Haraa<input name="haraa" placeholder="$0" /></label>
+        </div>
+        <div class="modal-measure-block">
+          <h3>Cabbirka iyo Lacagta</h3>
+          <div class="paper-lines modal-lines">
+            <label>Taariikh:<input data-modal-field="date" placeholder="__/__/____" /></label>
+            <label>Waagaga:<input data-modal-field="waaga" /></label>
+            <label>Maalinta:<input data-modal-field="maalinta" /></label>
+            <label>Bixiyey:<input data-modal-field="bixiyey" placeholder="$0" /></label>
+            <label>Faahfaahin:<input data-modal-field="details" /></label>
+            <label>Haraa:<input data-modal-field="haraa" placeholder="$0" /></label>
+          </div>
+          <div class="letter-grid modal-letter-grid">
+            <label><span>L</span><input data-modal-measure="Sare L" /></label><label><span>B</span><input data-modal-measure="Sare B" /></label><label><span>P</span><input data-modal-measure="Sare P" /></label><label><span>S</span><input data-modal-measure="Sare S" /></label><label><span>M</span><input data-modal-measure="Sare M" /></label><label><span>K</span><input data-modal-measure="Sare K" /></label><label><span>X</span><input data-modal-measure="Sare X" /></label><label><span>X</span><input data-modal-measure="Sare X 2" /></label><label><span>G</span><input data-modal-measure="Sare G" /></label>
+            <label><span>L</span><input data-modal-measure="Hoose L" /></label><label><span>B</span><input data-modal-measure="Hoose B" /></label><label><span>P</span><input data-modal-measure="Hoose P" /></label><label><span>K</span><input data-modal-measure="Hoose K" /></label><label><span>C</span><input data-modal-measure="Hoose C" /></label><label><span>T</span><input data-modal-measure="Hoose T" /></label><label class="empty-cell"><span></span><input disabled /></label><label class="empty-cell"><span></span><input disabled /></label><label class="empty-cell"><span></span><input disabled /></label>
+          </div>
         </div>
         <label>Qoraal<textarea name="note" rows="3" placeholder="Faahfaahin kooban..."></textarea></label>
         <p class="form-status" data-form-status></p>

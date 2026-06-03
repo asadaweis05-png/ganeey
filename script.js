@@ -551,6 +551,32 @@ const collectMeasurementRecord = () => {
   };
 };
 
+const collectModalMeasurementRecord = (customer) => {
+  const fields = Object.fromEntries(
+    [...customerForm.querySelectorAll("[data-modal-field]")]
+      .filter((input) => input.value.trim())
+      .map((input) => [input.dataset.modalField, input.value.trim()])
+  );
+  const values = Object.fromEntries(
+    [...customerForm.querySelectorAll("[data-modal-measure]")]
+      .filter((input) => input.value.trim())
+      .map((input) => [input.dataset.modalMeasure, input.value.trim()])
+  );
+
+  fields.name = customer.name;
+  fields.phone = customer.phone;
+  fields.bixiyey = fields.bixiyey || customer.bixiyey || "";
+  fields.haraa = fields.haraa || customer.haraa || "";
+
+  return {
+    customerId: customer.id,
+    customerName: customer.name,
+    fields,
+    values,
+    updatedAt: new Date().toISOString(),
+  };
+};
+
 const renderSavedMeasurements = () => {
   const record = selectedCustomer ? measurements[selectedCustomer.id] : null;
   if (!record?.values || !Object.keys(record.values).length) {
@@ -677,10 +703,19 @@ customerForm.addEventListener("submit", async (event) => {
 
   customers.unshift(customer);
   selectedCustomer = customer;
+  const modalRecord = collectModalMeasurementRecord(customer);
+  const hasModalMeasurement = Object.keys(modalRecord.values).length || modalRecord.fields.bixiyey || modalRecord.fields.haraa || modalRecord.fields.details;
+  if (hasModalMeasurement) {
+    measurements[customer.id] = modalRecord;
+    customer.bixiyey = modalRecord.fields.bixiyey || customer.bixiyey;
+    customer.haraa = modalRecord.fields.haraa || customer.haraa;
+  }
   renderAll();
   formStatus.textContent = "Saving customer to Supabase...";
-  const saved = await syncStore(keys.customers, customers);
-  formStatus.textContent = saved ? "Macmiilka Supabase ayaa lagu keydiyay." : "Macmiilka browser-ka ayuu ku keydsan yahay; Supabase wuu fashilmay.";
+  const savedCustomers = await syncStore(keys.customers, customers);
+  const savedMeasurements = hasModalMeasurement ? await syncStore(keys.measurements, measurements) : true;
+  const saved = savedCustomers && savedMeasurements;
+  formStatus.textContent = saved ? "Macmiilka iyo cabbirka Supabase ayaa lagu keydiyay." : "Macmiilka browser-ka ayuu ku keydsan yahay; Supabase wuu fashilmay.";
   customerForm.reset();
   closeCustomerModal();
   selectCustomerProfile(customer);

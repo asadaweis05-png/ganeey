@@ -1384,7 +1384,8 @@ blockquote {
 .paper-sheet input,
 .paper-sheet textarea,
 .modal-card input,
-.modal-card textarea {
+.modal-card textarea,
+.modal-card select {
   width: 100%;
   border: 0;
   border-bottom: 2px solid #254f9b;
@@ -1609,10 +1610,36 @@ blockquote {
 }
 
 .modal-card input,
-.modal-card textarea {
+.modal-card textarea,
+.modal-card select {
   border: 1px solid var(--line);
   border-radius: 7px;
   padding: 12px;
+}
+
+.modal-measure-block {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.modal-measure-block h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.modal-lines {
+  max-width: none;
+  margin-top: 0;
+}
+
+.modal-letter-grid {
+  max-width: none;
+  margin-top: 0;
+}
+
+.modal-letter-grid label {
+  min-width: 42px;
 }
 
 .modal-actions {
