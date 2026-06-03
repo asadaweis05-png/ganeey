@@ -1417,7 +1417,7 @@ blockquote {
   border-right: 0;
 }
 
-.letter-grid label:nth-last-child(-n + 9) {
+.letter-grid label:nth-child(n + 10) {
   border-bottom: 0;
 }
 
@@ -1576,7 +1576,9 @@ blockquote {
 
 .modal-card {
   position: relative;
-  width: min(680px, 100%);
+  width: min(980px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
   border-radius: 12px;
   background: #fff;
   padding: 30px;
@@ -1640,6 +1642,23 @@ blockquote {
 
 .modal-letter-grid label {
   min-width: 42px;
+}
+
+.modal-measure-block .paper-lines label,
+.modal-measure-block .letter-grid label {
+  color: #254f9b;
+}
+
+.modal-measure-block .paper-lines input,
+.modal-measure-block .letter-grid input {
+  border: 0;
+  border-radius: 0;
+  border-bottom: 2px solid #254f9b;
+  color: #111;
+}
+
+.modal-measure-block .letter-grid input {
+  border-bottom: 0;
 }
 
 .modal-actions {
