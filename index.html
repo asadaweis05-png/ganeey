@@ -94,10 +94,10 @@
           </div>
 
           <div class="stats-grid">
-            <article class="stat-card"><span class="stat-icon navy"></span><p>Dalabyada Guud</p><strong>0</strong><em>Data dhab ah</em></article>
-            <article class="stat-card"><span class="stat-icon sand"></span><p>Dalabyo Sugaya</p><strong>0</strong><em>Data dhab ah</em></article>
-            <article class="stat-card"><span class="stat-icon soft"></span><p>La Dhammeeyay</p><strong>0</strong><em>Data dhab ah</em></article>
-            <article class="stat-card"><span class="stat-icon bronze"></span><p>Dakhliga Guud</p><strong>$0</strong><em>Data dhab ah</em></article>
+            <article class="stat-card"><span class="stat-icon navy"></span><p>Macmiil Guud</p><strong data-stat-customers>0</strong><em>Data dhab ah</em></article>
+            <article class="stat-card"><span class="stat-icon sand"></span><p>Haraa Guud</p><strong data-stat-balance>$0</strong><em class="danger">Lacag harsan</em></article>
+            <article class="stat-card"><span class="stat-icon soft"></span><p>La Dhammeeyay</p><strong data-stat-paid-customers>0</strong><em>Macmiil bixiyay</em></article>
+            <article class="stat-card"><span class="stat-icon bronze"></span><p>Dakhliga Guud</p><strong data-stat-income>$0</strong><em>Bixiyey</em></article>
           </div>
 
           <div class="dash-grid">
@@ -166,11 +166,11 @@
         <section class="view" id="analytics">
           <div class="page-head"><div><h2>Falanqeynta Dakhliga</h2><p>Raac waxqabadka ganacsiga harqaanka si xirfad leh.</p></div><div class="tabs"><button class="is-active">12 Bilood</button><button>Sannadkan</button><button>Xilli Gaar ah</button></div></div>
           <div class="analytics-grid">
-            <article class="dark-card"><p>Dakhliga Sanadlaha</p><strong>$0</strong><span>Weli data lama gelin</span><div class="progress"><i style="width: 0"></i></div><small>0% yoolkii la gaaray</small></article>
-            <article class="panel avg-card"><span class="stat-icon sand"></span><p>Qiimaha Celceliska Dalabka</p><strong>$0</strong><hr /><small>Ugu sarreeyay: <b>Weli ma jiro</b></small></article>
+            <article class="dark-card"><p>Dakhliga Sanadlaha</p><strong data-analytics-income>$0</strong><span data-analytics-balance>Haraa: $0</span><div class="progress"><i data-analytics-progress style="width: 0"></i></div><small data-analytics-rate>0% lacagta ayaa la bixiyay</small></article>
+            <article class="panel avg-card"><span class="stat-icon sand"></span><p>Qiimaha Celceliska Macmiilka</p><strong data-analytics-average>$0</strong><hr /><small>Macmiil bixin leh: <b data-analytics-paid-count>0</b></small></article>
             <article class="panel garment-card"><p>Dharka Ugu Iibka Badan</p><h3>Weli lama hayo</h3><div class="fabric"><span>0 xabo la iibiyay<br />Koror: 0%</span></div></article>
             <article class="dark-card curve-card"><div class="panel-title"><h3>Kobaca Bil kasta</h3><p>Dakhli iyo saadaal</p></div><svg viewBox="0 0 600 260" aria-hidden="true"><path d="M20 210 C80 170 110 205 160 170 S250 105 300 150 S390 215 430 95 S520 110 570 40" /><path class="fill" d="M20 210 C80 170 110 205 160 170 S250 105 300 150 S390 215 430 95 S520 110 570 40 L570 250 L20 250 Z" /></svg></article>
-            <article class="panel category-card"><h3>Qeybaha Dalabka</h3><div class="abstract-shape"><b>0</b><span>Dalab guud</span></div><p><i></i> Suud gaar ah <b>0%</b></p><p><i class="black"></i> Dirac dhaqameed <b>0%</b></p></article>
+            <article class="panel category-card"><h3>Qeybaha Lacagta</h3><div class="abstract-shape"><b data-category-total>$0</b><span>Bixiyey + Haraa</span></div><p><i></i> Bixiyey <b data-category-paid>0%</b></p><p><i class="black"></i> Haraa <b data-category-balance>0%</b></p></article>
             <article class="panel team-card"><div class="panel-title"><div><h3>Waxqabadka Shaqaalaha</h3><p>Waxtar iyo qanacsanaan macmiil.</p></div><a href="#">Warbixin buuxda</a></div><div class="empty-state">Weli shaqaale ama waxqabad lama gelin.</div></article>
           </div>
         </section>
@@ -197,13 +197,13 @@
               <div class="paper-lines">
                 <label>Waagaga:<input data-field="waaga" /></label>
                 <label>Maalinta:<input data-field="maalinta" /></label>
-                <label>Bixiyey:<input data-field="bixiyey" /></label>
+                <label>Bixiyey:<input data-field="bixiyey" placeholder="$0" /></label>
                 <label>Faahfaahin:<input data-field="details" /></label>
-                <label>Haraa:<input data-field="haraa" /></label>
+                <label>Haraa:<input data-field="haraa" placeholder="$0" /></label>
               </div>
               <div class="letter-grid" data-letter-grid>
-                <label><span>L</span><input data-measure="Sare L" /></label><label><span>B</span><input data-measure="Sare B" /></label><label><span>P</span><input data-measure="Sare P" /></label><label><span>S</span><input data-measure="Sare S" /></label><label><span>M</span><input data-measure="Sare M" /></label><label><span>K</span><input data-measure="Sare K" /></label><label><span>X</span><input data-measure="Sare X" /></label>
-                <label><span>L</span><input data-measure="Hoose L" /></label><label><span>B</span><input data-measure="Hoose B" /></label><label><span>P</span><input data-measure="Hoose P" /></label><label><span>K</span><input data-measure="Hoose K" /></label><label><span>C</span><input data-measure="Hoose C" /></label><label><span>T</span><input data-measure="Hoose T" /></label><label class="empty-cell"><span></span><input disabled /></label>
+                <label><span>L</span><input data-measure="Sare L" /></label><label><span>B</span><input data-measure="Sare B" /></label><label><span>P</span><input data-measure="Sare P" /></label><label><span>S</span><input data-measure="Sare S" /></label><label><span>M</span><input data-measure="Sare M" /></label><label><span>K</span><input data-measure="Sare K" /></label><label><span>X</span><input data-measure="Sare X" /></label><label><span>X</span><input data-measure="Sare X 2" /></label><label><span>X</span><input data-measure="Sare X 3" /></label>
+                <label><span>L</span><input data-measure="Hoose L" /></label><label><span>B</span><input data-measure="Hoose B" /></label><label><span>P</span><input data-measure="Hoose P" /></label><label><span>K</span><input data-measure="Hoose K" /></label><label><span>C</span><input data-measure="Hoose C" /></label><label><span>T</span><input data-measure="Hoose T" /></label><label class="empty-cell"><span></span><input disabled /></label><label class="empty-cell"><span></span><input disabled /></label><label class="empty-cell"><span></span><input disabled /></label>
               </div>
               <div class="signatures">
                 <label>Saxiixa qaataha:<input /></label>
@@ -221,7 +221,7 @@
 <section class="view" id="invoices">
           <div class="page-head"><div><h2>Biilal & Lacag-bixin</h2><p>Maamul lacagaha macmiilka iyo diiwaanka maaliyadda.</p></div><div class="head-actions"><button class="outline-btn">Soo saar Warqad</button><button class="primary-small">Samee Biil Cusub</button></div></div>
           <div class="billing-grid">
-            <div class="billing-stats"><article class="panel money-card"><p>La bixiyay</p><strong>$0</strong></article><article class="panel money-card danger"><p>Daahay</p><strong>$0</strong></article><article class="panel collection"><p>Ururinta Bishan</p><strong>$0</strong><small>Weli lacag lama gelin</small></article></div>
+            <div class="billing-stats"><article class="panel money-card"><p>La bixiyay</p><strong data-billing-paid>$0</strong></article><article class="panel money-card danger"><p>Haraa</p><strong data-billing-balance>$0</strong></article><article class="panel collection"><p>Wadarta Qiimaha</p><strong data-billing-total>$0</strong><small data-billing-summary>Weli lacag lama gelin</small></article></div>
             <article class="panel transaction-card"><h3>Macamiladii Dhawaa</h3><div class="empty-state">Weli macaamil lacag-bixin lama gelin.</div></article>
             <article class="panel invoice-preview"><h3>BIIL</h3><p>Tixraac: Weli ma jiro</p><div class="invoice-address"><strong>Waxaa lagu qoray:</strong><b>Macmiil lama dooran</b><span>Ku dar biil si xog dhab ah uga muuqato.</span></div><table><tbody><tr><td>Weli adeeg lama gelin</td><td>0</td><td>$0</td><td>$0</td></tr></tbody></table><footer><span>Wadar</span><strong>$0</strong></footer></article>
             <aside class="panel payment-panel"><h3>Ficillo Degdeg ah</h3><button class="black-btn">Daabac Biil</button><button class="whatsapp-btn">WhatsApp Biil</button><button class="outline-btn">Iimayl PDF</button><h3>Hababka Lacagta</h3><div class="pay-method active">Zaad Service<small>Lacag moobil Telesom</small></div><div class="pay-method">EVC Plus<small>Lacag moobil Hormuud</small></div><div class="pay-method">Caddaan<small>Lacag gacanta ah</small></div><div class="pay-method">Sahal<small>Lacag moobil Golis</small></div></aside>
@@ -241,6 +241,8 @@
           <label>Telefoon<input name="phone" required placeholder="+252 61..." /></label>
           <label>Magaalo<input name="city" placeholder="Magaalada" /></label>
           <label>Nooca dharka<input name="garment" placeholder="Khamiis, Suud, Dirac..." /></label>
+          <label>Bixiyey<input name="bixiyey" placeholder="$0" /></label>
+          <label>Haraa<input name="haraa" placeholder="$0" /></label>
         </div>
         <label>Qoraal<textarea name="note" rows="3" placeholder="Faahfaahin kooban..."></textarea></label>
         <p class="form-status" data-form-status></p>

@@ -18,6 +18,25 @@ const profileName = document.querySelector("[data-profile-name]");
 const profileMeta = document.querySelector("[data-profile-meta]");
 const profileMeasures = document.querySelector("[data-profile-measures]");
 const profileMeasureDate = document.querySelector("[data-profile-measure-date]");
+const moneyElements = {
+  customers: document.querySelector("[data-stat-customers]"),
+  balance: document.querySelector("[data-stat-balance]"),
+  paidCustomers: document.querySelector("[data-stat-paid-customers]"),
+  income: document.querySelector("[data-stat-income]"),
+  analyticsIncome: document.querySelector("[data-analytics-income]"),
+  analyticsBalance: document.querySelector("[data-analytics-balance]"),
+  analyticsProgress: document.querySelector("[data-analytics-progress]"),
+  analyticsRate: document.querySelector("[data-analytics-rate]"),
+  analyticsAverage: document.querySelector("[data-analytics-average]"),
+  analyticsPaidCount: document.querySelector("[data-analytics-paid-count]"),
+  categoryTotal: document.querySelector("[data-category-total]"),
+  categoryPaid: document.querySelector("[data-category-paid]"),
+  categoryBalance: document.querySelector("[data-category-balance]"),
+  billingPaid: document.querySelector("[data-billing-paid]"),
+  billingBalance: document.querySelector("[data-billing-balance]"),
+  billingTotal: document.querySelector("[data-billing-total]"),
+  billingSummary: document.querySelector("[data-billing-summary]"),
+};
 
 const supabaseConfig = {
   url: "https://tfsxyxmbueosgfkwfnqq.supabase.co",
@@ -336,6 +355,43 @@ const formatDateTime = (value) => {
   return new Date(value).toLocaleDateString("so-SO", { day: "2-digit", month: "short", year: "numeric" });
 };
 
+const parseMoney = (value) => {
+  const normalized = String(value || "")
+    .replace(/,/g, "")
+    .match(/-?\d+(\.\d+)?/);
+  return normalized ? Number(normalized[0]) : 0;
+};
+
+const formatMoney = (value) => `$${Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+
+const getCustomerPayment = (customer) => {
+  const record = measurements[customer.id];
+  const fields = record?.fields || {};
+  return {
+    paid: parseMoney(fields.bixiyey || customer.bixiyey),
+    balance: parseMoney(fields.haraa || customer.haraa),
+  };
+};
+
+const getFinancialSummary = () => {
+  const rows = customers.map((customer) => ({ customer, ...getCustomerPayment(customer) }));
+  const paid = rows.reduce((total, row) => total + row.paid, 0);
+  const balance = rows.reduce((total, row) => total + row.balance, 0);
+  const total = paid + balance;
+  const paidCustomers = rows.filter((row) => row.paid > 0).length;
+  const balanceCustomers = rows.filter((row) => row.balance > 0).length;
+  return {
+    rows,
+    paid,
+    balance,
+    total,
+    paidCustomers,
+    balanceCustomers,
+    paidRate: total ? Math.round((paid / total) * 100) : 0,
+    average: rows.length ? paid / rows.length : 0,
+  };
+};
+
 const openCustomerModal = () => {
   modal.classList.add("is-open");
   modal.setAttribute("aria-hidden", "false");
@@ -347,12 +403,28 @@ function closeCustomerModal() {
   modal.setAttribute("aria-hidden", "true");
 }
 
+const fillMeasurementForm = (customer) => {
+  const record = customer ? measurements[customer.id] : null;
+  const fields = record?.fields || {};
+  document.querySelectorAll("[data-field]").forEach((input) => {
+    input.value = fields[input.dataset.field] || "";
+  });
+  document.querySelectorAll("[data-measure]").forEach((input) => {
+    input.value = record?.values?.[input.dataset.measure] || "";
+  });
+
+  if (!customer) return;
+  document.querySelector('[data-field="name"]').value = fields.name || customer.name || "";
+  document.querySelector('[data-field="phone"]').value = fields.phone || customer.phone || "";
+  document.querySelector('[data-field="bixiyey"]').value = fields.bixiyey || customer.bixiyey || "";
+  document.querySelector('[data-field="haraa"]').value = fields.haraa || customer.haraa || "";
+};
+
 const selectCustomer = (customer) => {
   selectedCustomer = customer;
   currentCustomer.textContent = customer.name;
   measureBreadcrumb.textContent = `Macaamiil > ${customer.name}`;
-  document.querySelector('[data-field="name"]').value = customer.name;
-  document.querySelector('[data-field="phone"]').value = customer.phone;
+  fillMeasurementForm(customer);
   renderProfile();
   renderSavedMeasurements();
   showView("measurements");
@@ -360,8 +432,7 @@ const selectCustomer = (customer) => {
 
 const selectCustomerProfile = (customer) => {
   selectedCustomer = customer;
-  document.querySelector('[data-field="name"]').value = customer.name;
-  document.querySelector('[data-field="phone"]').value = customer.phone;
+  fillMeasurementForm(customer);
   currentCustomer.textContent = customer.name;
   measureBreadcrumb.textContent = `Macaamiil > ${customer.name}`;
   renderAll();
@@ -379,13 +450,17 @@ const renderCustomers = () => {
 
   customersTable.innerHTML = customers
     .map(
-      (customer, index) => `
+      (customer, index) => {
+        const payment = getCustomerPayment(customer);
+        const status = payment.balance > 0 ? "Haraa" : payment.paid > 0 ? "Bixiyay" : "Sugaya";
+        return `
         <tr>
           <td><span class="mini-avatar ${index % 2 ? "gold" : "navy"}">${initials(customer.name)}</span><div>${escapeHtml(customer.name)}<small>${escapeHtml(customer.garment || "Macmiil cusub")}</small></div></td>
-          <td><mark class="${index % 2 ? "gray" : ""}">${index === 0 ? "Tolid" : "Cabbir"}</mark></td>
-          <td>Maanta</td>
+          <td><mark class="${payment.balance > 0 ? "red" : payment.paid > 0 ? "" : "gray"}">${status}</mark></td>
+          <td>${formatMoney(payment.paid)} / ${formatMoney(payment.balance)}</td>
           <td><button class="table-action" data-select-customer="${index}">Cabbir</button></td>
-        </tr>`
+        </tr>`;
+      }
     )
     .join("");
 };
@@ -406,7 +481,7 @@ const renderCustomerDirectory = () => {
             <button class="customer-row ${selectedCustomer?.id === customer.id ? "is-active" : ""}" type="button" data-profile-customer="${index}">
               <span class="mini-avatar ${index % 2 ? "gold" : "navy"}">${initials(customer.name)}</span>
               <span><strong>${escapeHtml(customer.name)}</strong><small>${escapeHtml(customer.phone || "Telefoon lama gelin")} · ${escapeHtml(customer.city || "Magaalo lama gelin")}</small></span>
-              <em>${escapeHtml(customer.garment || "Nooca dharka lama gelin")}</em>
+              <em>${formatMoney(getCustomerPayment(customer).paid)} bixiyey · ${formatMoney(getCustomerPayment(customer).balance)} haraa</em>
             </button>`
         )
         .join("")}
@@ -444,6 +519,8 @@ const renderProfile = () => {
   if (profileInitials) profileInitials.textContent = initials(customer.name);
   if (profileName) profileName.textContent = customer.name;
   if (profileMeta) profileMeta.textContent = `${customer.city || "Magaalo lama gelin"} · ${customer.phone || "Telefoon lama gelin"}`;
+  const payment = getCustomerPayment(customer);
+  if (profileMeta) profileMeta.textContent = `${customer.city || "Magaalo lama gelin"} · ${customer.phone || "Telefoon lama gelin"} · Bixiyey ${formatMoney(payment.paid)} · Haraa ${formatMoney(payment.balance)}`;
   if (profileMeasureDate) profileMeasureDate.textContent = record?.updatedAt ? `La cusbooneysiiyay: ${formatDateTime(record.updatedAt)}` : "Weli lama cusbooneysiin";
   if (profileMeasures) {
     profileMeasures.innerHTML = Object.entries(measureAliases)
@@ -477,13 +554,39 @@ const collectMeasurementRecord = () => {
 const renderSavedMeasurements = () => {
   const record = selectedCustomer ? measurements[selectedCustomer.id] : null;
   if (!record?.values || !Object.keys(record.values).length) {
-    savedMeasures.innerHTML = "<small>Weli cabbir lama gelin.</small>";
+    const payment = selectedCustomer ? getCustomerPayment(selectedCustomer) : { paid: 0, balance: 0 };
+    savedMeasures.innerHTML = `<small>Weli cabbir lama gelin. Bixiyey: ${formatMoney(payment.paid)} · Haraa: ${formatMoney(payment.balance)}</small>`;
     return;
   }
 
-  savedMeasures.innerHTML = Object.entries(record.values)
+  const paymentSummary = `<span>Bixiyey: ${formatMoney(parseMoney(record.fields?.bixiyey || selectedCustomer?.bixiyey))}</span><span>Haraa: ${formatMoney(parseMoney(record.fields?.haraa || selectedCustomer?.haraa))}</span>`;
+  savedMeasures.innerHTML = paymentSummary + Object.entries(record.values)
     .map(([label, value]) => `<span>${escapeHtml(label)}: ${escapeHtml(value)}</span>`)
     .join("");
+};
+
+const renderFinancials = () => {
+  const summary = getFinancialSummary();
+  const paidPercent = `${summary.paidRate}%`;
+  const balancePercent = `${summary.total ? 100 - summary.paidRate : 0}%`;
+
+  if (moneyElements.customers) moneyElements.customers.textContent = String(customers.length);
+  if (moneyElements.balance) moneyElements.balance.textContent = formatMoney(summary.balance);
+  if (moneyElements.paidCustomers) moneyElements.paidCustomers.textContent = String(summary.paidCustomers);
+  if (moneyElements.income) moneyElements.income.textContent = formatMoney(summary.paid);
+  if (moneyElements.analyticsIncome) moneyElements.analyticsIncome.textContent = formatMoney(summary.paid);
+  if (moneyElements.analyticsBalance) moneyElements.analyticsBalance.textContent = `Haraa: ${formatMoney(summary.balance)}`;
+  if (moneyElements.analyticsProgress) moneyElements.analyticsProgress.style.width = paidPercent;
+  if (moneyElements.analyticsRate) moneyElements.analyticsRate.textContent = `${paidPercent} lacagta ayaa la bixiyay`;
+  if (moneyElements.analyticsAverage) moneyElements.analyticsAverage.textContent = formatMoney(summary.average);
+  if (moneyElements.analyticsPaidCount) moneyElements.analyticsPaidCount.textContent = String(summary.paidCustomers);
+  if (moneyElements.categoryTotal) moneyElements.categoryTotal.textContent = formatMoney(summary.total);
+  if (moneyElements.categoryPaid) moneyElements.categoryPaid.textContent = paidPercent;
+  if (moneyElements.categoryBalance) moneyElements.categoryBalance.textContent = balancePercent;
+  if (moneyElements.billingPaid) moneyElements.billingPaid.textContent = formatMoney(summary.paid);
+  if (moneyElements.billingBalance) moneyElements.billingBalance.textContent = formatMoney(summary.balance);
+  if (moneyElements.billingTotal) moneyElements.billingTotal.textContent = formatMoney(summary.total);
+  if (moneyElements.billingSummary) moneyElements.billingSummary.textContent = `${summary.balanceCustomers} macmiil ayaa haraa leh`;
 };
 
 const renderAll = () => {
@@ -491,6 +594,7 @@ const renderAll = () => {
   renderCustomers();
   renderCustomerDirectory();
   renderProfile();
+  renderFinancials();
   if (selectedCustomer) {
     currentCustomer.textContent = selectedCustomer.name;
     measureBreadcrumb.textContent = `Macaamiil > ${selectedCustomer.name}`;
@@ -561,6 +665,8 @@ customerForm.addEventListener("submit", async (event) => {
     phone: String(form.get("phone") || "").trim(),
     city: String(form.get("city") || "").trim(),
     garment: String(form.get("garment") || "").trim(),
+    bixiyey: String(form.get("bixiyey") || "").trim(),
+    haraa: String(form.get("haraa") || "").trim(),
     note: String(form.get("note") || "").trim(),
   };
 
@@ -608,12 +714,25 @@ document.querySelector("[data-save-measurements]").addEventListener("click", asy
 
   const record = collectMeasurementRecord();
   measurements[record.customerId] = record;
+  const customerIndex = customers.findIndex((customer) => customer.id === record.customerId);
+  if (customerIndex >= 0) {
+    customers[customerIndex] = {
+      ...customers[customerIndex],
+      name: record.fields.name || customers[customerIndex].name,
+      phone: record.fields.phone || customers[customerIndex].phone,
+      bixiyey: record.fields.bixiyey || customers[customerIndex].bixiyey || "",
+      haraa: record.fields.haraa || customers[customerIndex].haraa || "",
+    };
+    selectedCustomer = customers[customerIndex];
+  }
+  renderAll();
   renderProfile();
   renderSavedMeasurements();
+  const savedCustomers = await syncStore(keys.customers, customers);
   const saved = await syncStore(keys.measurements, measurements);
   savedMeasures.insertAdjacentHTML(
     "beforeend",
-    `<small>${saved ? " Cabbirka Supabase ayaa lagu keydiyay." : " Supabase save failed; browser backup only."}</small>`
+    `<small>${saved && savedCustomers ? " Cabbirka iyo lacagta Supabase ayaa lagu keydiyay." : " Supabase save failed; browser backup only."}</small>`
   );
 });
 
