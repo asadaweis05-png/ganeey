@@ -18,6 +18,16 @@ const profileName = document.querySelector("[data-profile-name]");
 const profileMeta = document.querySelector("[data-profile-meta]");
 const profileMeasures = document.querySelector("[data-profile-measures]");
 const profileMeasureDate = document.querySelector("[data-profile-measure-date]");
+const searchInput = document.querySelector("[data-global-search]");
+const searchResults = document.querySelector("[data-search-results]");
+const haraaList = document.querySelector("[data-haraa-list]");
+const haraaTotal = document.querySelector("[data-haraa-total]");
+const profileModal = document.querySelector("[data-profile-modal]");
+const profileForm = document.querySelector("[data-profile-form]");
+const profileStatus = document.querySelector("[data-profile-status]");
+const themeToggle = document.querySelector("[data-theme-toggle]");
+const imagePreviews = document.querySelector("[data-image-previews]");
+const modalImagePreviews = document.querySelector("[data-modal-image-previews]");
 const moneyElements = {
   customers: document.querySelector("[data-stat-customers]"),
   balance: document.querySelector("[data-stat-balance]"),
@@ -48,6 +58,8 @@ const keys = {
   customers: "tailor-system-customers",
   measurements: "tailor-system-measurements",
   session: "tailor-system-supabase-session",
+  profile: "tailor-system-profile",
+  theme: "tailor-system-theme",
 };
 
 const defaultCustomers = [];
@@ -57,6 +69,8 @@ let measurements = {};
 let selectedCustomer = null;
 let currentUser = null;
 let supabaseReady = false;
+let profileSettings = {};
+let modalImages = {};
 
 const fakeCustomerNames = new Set(["Ahmed Hassan", "Muna Farah"]);
 
@@ -71,6 +85,8 @@ const readJson = (key, fallback) => {
 const writeJson = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
+
+profileSettings = readJson(keys.profile, {});
 
 const normalizeEmail = (email) => String(email || "").trim().toLowerCase();
 
@@ -169,7 +185,7 @@ const userNameFrom = (user) => user?.user_metadata?.name || user?.email || "User
 const showAppForUser = async (user) => {
   currentUser = user;
   document.body.classList.add("is-authenticated");
-  if (userPill) userPill.textContent = userNameFrom(user);
+  if (userPill) userPill.textContent = profileSettings.name || userNameFrom(user);
   setAuthStatus("");
   await loadSupabaseState();
 };
@@ -216,11 +232,13 @@ const syncStore = async (key, value) => {
 const syncAllState = async () => {
   await syncStore(keys.customers, customers);
   await syncStore(keys.measurements, measurements);
+  await syncStore(keys.profile, profileSettings);
 };
 
 const loadSupabaseState = async () => {
   customers = sanitizeCustomers(readJson(keys.customers, defaultCustomers));
   measurements = readJson(keys.measurements, {});
+  profileSettings = readJson(keys.profile, {});
 
   if (!currentUser?.id) {
     supabaseReady = false;
@@ -246,8 +264,10 @@ const loadSupabaseState = async () => {
   const remote = Object.fromEntries((data || []).map((row) => [row.key, row.value]));
   customers = sanitizeCustomers(remote[keys.customers] || customers);
   measurements = remote[keys.measurements] || measurements;
+  profileSettings = remote[keys.profile] || profileSettings;
   writeJson(keys.customers, customers);
   writeJson(keys.measurements, measurements);
+  writeJson(keys.profile, profileSettings);
   supabaseReady = true;
 
   if (!data?.length) {
@@ -392,7 +412,91 @@ const getFinancialSummary = () => {
   };
 };
 
+const fileToDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+const renderImagePreviews = (images = {}, target = imagePreviews) => {
+  if (!target) return;
+  target.innerHTML = ["upper", "lower"]
+    .map((slot) => {
+      const label = slot === "upper" ? "Sare" : "Hoose";
+      return `<div class="image-preview">${images[slot] ? `<img src="${images[slot]}" alt="${label}" />` : `<small>${label} image</small>`}</div>`;
+    })
+    .join("");
+};
+
+const applyTheme = (theme = readJson(keys.theme, "light")) => {
+  const isDark = theme === "dark";
+  document.body.classList.toggle("dark-mode", isDark);
+  if (themeToggle) themeToggle.textContent = isDark ? "Light" : "Dark";
+  writeJson(keys.theme, theme);
+};
+
+const renderSearchResults = (query) => {
+  if (!searchResults) return;
+  const term = String(query || "").trim().toLowerCase();
+  if (!term) {
+    searchResults.classList.remove("is-open");
+    searchResults.innerHTML = "";
+    return;
+  }
+
+  const matches = customers.filter((customer) =>
+    [customer.name, customer.phone, customer.city, customer.garment].some((value) => String(value || "").toLowerCase().includes(term))
+  );
+
+  searchResults.innerHTML = matches.length
+    ? matches
+        .map((customer) => {
+          const index = customers.findIndex((item) => item.id === customer.id);
+          const payment = getCustomerPayment(customer);
+          return `<button type="button" data-search-customer="${index}"><span><strong>${escapeHtml(customer.name)}</strong><small>${escapeHtml(customer.phone || "")} · ${escapeHtml(customer.garment || "")}</small></span><b>${formatMoney(payment.balance)}</b></button>`;
+        })
+        .join("")
+    : '<div class="empty-state">Macmiil lama helin.</div>';
+  searchResults.classList.add("is-open");
+};
+
+const openProfileModal = () => {
+  if (!profileModal || !profileForm) return;
+  profileModal.classList.add("is-open");
+  profileModal.setAttribute("aria-hidden", "false");
+  profileForm.elements.name.value = profileSettings.name || currentUser?.user_metadata?.name || "";
+  profileForm.elements.email.value = currentUser?.email || "";
+  profileForm.elements.password.value = "";
+  profileForm.elements.twofaPhone.value = profileSettings.twofaPhone || "";
+  profileForm.elements.twofaEnabled.checked = Boolean(profileSettings.twofaEnabled);
+};
+
+const closeProfileModal = () => {
+  if (!profileModal) return;
+  profileModal.classList.remove("is-open");
+  profileModal.setAttribute("aria-hidden", "true");
+};
+
+const renderHaraaList = () => {
+  if (!haraaList) return;
+  const rows = getFinancialSummary().rows.filter((row) => row.balance > 0);
+  const total = rows.reduce((sum, row) => sum + row.balance, 0);
+  if (haraaTotal) haraaTotal.textContent = formatMoney(total);
+  haraaList.innerHTML = rows.length
+    ? rows
+        .map((row) => {
+          const index = customers.findIndex((customer) => customer.id === row.customer.id);
+          return `<button class="haraa-row" type="button" data-profile-customer="${index}"><span><strong>${escapeHtml(row.customer.name)}</strong><small>${escapeHtml(row.customer.phone || "Telefoon lama gelin")}</small></span><b>${formatMoney(row.balance)}</b></button>`;
+        })
+        .join("")
+    : '<div class="empty-state">Hadda macmiil haraa leh ma jiro.</div>';
+};
+
 const openCustomerModal = () => {
+  modalImages = {};
+  renderImagePreviews(modalImages, modalImagePreviews);
   modal.classList.add("is-open");
   modal.setAttribute("aria-hidden", "false");
   customerForm.elements.name.focus();
@@ -412,6 +516,7 @@ const fillMeasurementForm = (customer) => {
   document.querySelectorAll("[data-measure]").forEach((input) => {
     input.value = record?.values?.[input.dataset.measure] || "";
   });
+  renderImagePreviews(record?.images || {});
 
   if (!customer) return;
   document.querySelector('[data-field="name"]').value = fields.name || customer.name || "";
@@ -547,6 +652,7 @@ const collectMeasurementRecord = () => {
     customerName: fields.name || selectedCustomer?.name || "Macmiil",
     fields,
     values,
+    images: measurements[selectedCustomer?.id]?.images || {},
     updatedAt: new Date().toISOString(),
   };
 };
@@ -573,6 +679,7 @@ const collectModalMeasurementRecord = (customer) => {
     customerName: customer.name,
     fields,
     values,
+    images: { ...modalImages },
     updatedAt: new Date().toISOString(),
   };
 };
@@ -621,6 +728,7 @@ const renderAll = () => {
   renderCustomerDirectory();
   renderProfile();
   renderFinancials();
+  renderHaraaList();
   if (selectedCustomer) {
     currentCustomer.textContent = selectedCustomer.name;
     measureBreadcrumb.textContent = `Macaamiil > ${selectedCustomer.name}`;
@@ -682,6 +790,68 @@ modal.addEventListener("click", (event) => {
   if (event.target === modal) closeCustomerModal();
 });
 
+profileModal?.addEventListener("click", (event) => {
+  if (event.target === profileModal) closeProfileModal();
+});
+
+document.querySelectorAll("[data-open-profile]").forEach((button) => {
+  button.addEventListener("click", openProfileModal);
+});
+
+document.querySelectorAll("[data-close-profile]").forEach((button) => {
+  button.addEventListener("click", closeProfileModal);
+});
+
+themeToggle?.addEventListener("click", () => {
+  applyTheme(document.body.classList.contains("dark-mode") ? "light" : "dark");
+});
+
+searchInput?.addEventListener("input", (event) => {
+  renderSearchResults(event.currentTarget.value);
+});
+
+searchResults?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-search-customer]");
+  if (!button) return;
+  searchInput.value = "";
+  searchResults.classList.remove("is-open");
+  selectCustomerProfile(customers[Number(button.dataset.searchCustomer)]);
+});
+
+profileForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const form = new FormData(profileForm);
+  profileSettings = {
+    name: String(form.get("name") || "").trim(),
+    twofaPhone: String(form.get("twofaPhone") || "").trim(),
+    twofaEnabled: form.get("twofaEnabled") === "on",
+  };
+
+  const password = String(form.get("password") || "");
+  if (password && password.length < 6) {
+    profileStatus.textContent = "Password-ku waa inuu ahaadaa ugu yaraan 6 xaraf.";
+    profileStatus.dataset.type = "error";
+    return;
+  }
+
+  try {
+    if (password || profileSettings.name) {
+      await supabaseRequest("/auth/v1/user", {
+        method: "PUT",
+        body: JSON.stringify({ ...(password ? { password } : {}), data: { name: profileSettings.name } }),
+      });
+    }
+    writeJson(keys.profile, profileSettings);
+    await syncStore(keys.profile, profileSettings);
+    if (userPill) userPill.textContent = profileSettings.name || currentUser?.email || "User";
+    profileStatus.textContent = profileSettings.twofaEnabled ? "Profile waa la keydiyay. 2FA setting waa daaran yahay." : "Profile waa la keydiyay.";
+    profileStatus.dataset.type = "ok";
+  } catch (error) {
+    profileStatus.textContent = error.message || "Profile lama keydin.";
+    profileStatus.dataset.type = "error";
+  }
+});
+
 customerForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = new FormData(customerForm);
@@ -717,6 +887,8 @@ customerForm.addEventListener("submit", async (event) => {
   const saved = savedCustomers && savedMeasurements;
   formStatus.textContent = saved ? "Macmiilka iyo cabbirka Supabase ayaa lagu keydiyay." : "Macmiilka browser-ka ayuu ku keydsan yahay; Supabase wuu fashilmay.";
   customerForm.reset();
+  modalImages = {};
+  renderImagePreviews(modalImages, modalImagePreviews);
   closeCustomerModal();
   selectCustomerProfile(customer);
 });
@@ -731,6 +903,37 @@ customerDirectory?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-profile-customer]");
   if (!button) return;
   selectCustomerProfile(customers[Number(button.dataset.profileCustomer)]);
+});
+
+haraaList?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-profile-customer]");
+  if (!button) return;
+  selectCustomerProfile(customers[Number(button.dataset.profileCustomer)]);
+});
+
+document.querySelectorAll("[data-modal-image]").forEach((input) => {
+  input.addEventListener("change", async (event) => {
+    const file = event.currentTarget.files?.[0];
+    if (!file) return;
+    modalImages[event.currentTarget.dataset.modalImage] = await fileToDataUrl(file);
+    renderImagePreviews(modalImages, modalImagePreviews);
+  });
+});
+
+document.querySelectorAll("[data-image-upload]").forEach((input) => {
+  input.addEventListener("change", async (event) => {
+    const file = event.currentTarget.files?.[0];
+    if (!file || !selectedCustomer?.id) return;
+    const image = await fileToDataUrl(file);
+    const existing = measurements[selectedCustomer.id] || collectMeasurementRecord();
+    measurements[selectedCustomer.id] = {
+      ...existing,
+      images: { ...(existing.images || {}), [event.currentTarget.dataset.imageUpload]: image },
+      updatedAt: new Date().toISOString(),
+    };
+    renderImagePreviews(measurements[selectedCustomer.id].images || {});
+    await syncStore(keys.measurements, measurements);
+  });
 });
 
 document.querySelector("[data-edit-profile-measures]")?.addEventListener("click", () => {
@@ -784,4 +987,5 @@ document.querySelector("[data-clear-measurements]").addEventListener("click", as
   savedMeasures.innerHTML = "";
 });
 
+applyTheme();
 initAuth();

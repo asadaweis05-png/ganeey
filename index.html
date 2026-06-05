@@ -51,6 +51,7 @@
         <button class="nav-item" data-view-target="measurements"><span class="icon ruler"></span>Cabbirro</button>
         <button class="nav-item" data-view-target="orders"><span class="icon bag"></span>Dalabyo</button>
         <button class="nav-item" data-view-target="invoices"><span class="icon receipt"></span>Biilal</button>
+        <button class="nav-item" data-view-target="haraa"><span class="icon receipt"></span>Haraa</button>
         <button class="nav-item" data-view-target="analytics"><span class="icon chart"></span>Falanqeyn</button>
         <button class="nav-item"><span class="icon gear"></span>Dejin</button>
       </nav>
@@ -67,14 +68,16 @@
         <button class="menu-btn" data-menu-toggle aria-label="Fur menu"><span></span><span></span></button>
         <label class="search">
           <span></span>
-          <input type="search" placeholder="Raadi dalab, macmiil, ama biil..." />
+          <input type="search" data-global-search placeholder="Raadi macmiil..." />
+          <div class="search-results" data-search-results></div>
         </label>
         <div class="top-actions">
           <p class="sync-pill" data-sync-status>Supabase connecting...</p>
+          <button class="outline-btn" data-theme-toggle type="button">Dark</button>
           <button class="ghost-icon" aria-label="Ogeysiis"></button>
           <button class="ghost-icon message" aria-label="Fariimo"></button>
           <button class="primary-small" data-open-customer>Ku dar Macmiil</button>
-          <button class="outline-btn user-pill" data-user-pill type="button">User</button>
+          <button class="outline-btn user-pill" data-user-pill data-open-profile type="button">User</button>
           <button class="outline-btn" data-sign-out type="button">Sign out</button>
           <div class="avatar">ST</div>
         </div>
@@ -175,6 +178,14 @@
           </div>
         </section>
 
+        <section class="view" id="haraa">
+          <div class="page-head"><div><h2>Haraa Macaamiisha</h2><p>Liiska macaamiisha lacagta harsan lagu leeyahay.</p></div><div class="head-actions"><button class="outline-btn" data-open-customer>Ku dar Macmiil</button></div></div>
+          <article class="panel table-panel">
+            <div class="panel-title"><h3>Macaamiisha Haraa Leh</h3><strong data-haraa-total>$0</strong></div>
+            <div data-haraa-list></div>
+          </article>
+        </section>
+
         <section class="view" id="orders">
           <div class="page-head"><div><h2>Raad-raaca Dalabyada</h2><p>Xaaladda dalabyada socda waqtiga-dhabta ah.</p></div><div class="head-actions"><button class="outline-btn">Shaandhee</button><button class="outline-btn">Soo saar</button></div></div>
           <div class="kanban">
@@ -213,6 +224,11 @@
             <aside class="panel measurement-side">
               <h3>Macmiilka Cabbirka</h3>
               <p data-current-customer>Macmiil lama dooran</p>
+              <div class="image-upload-grid">
+                <label>Midabka Sare<input type="file" accept="image/*" data-image-upload="upper" /></label>
+                <label>Midabka Hoose<input type="file" accept="image/*" data-image-upload="lower" /></label>
+              </div>
+              <div class="image-preview-grid" data-image-previews></div>
               <div class="saved-measures" data-saved-measures></div>
               <button class="muted-btn" data-clear-measurements>Nadiifi Foomka</button>
             </aside>
@@ -240,7 +256,7 @@
           <label>Magaca<input name="name" required placeholder="Magaca macmiilka" /></label>
           <label>Telefoon<input name="phone" required placeholder="+252 61..." /></label>
           <label>Magaalo<input name="city" placeholder="Magaalada" /></label>
-          <label>Nooca dharka<select name="garment" required><option value="">Dooro nooca</option><option value="shaati">Shaati</option><option value="sarwaal">Sarwaal</option><option value="khamiis">Khamiis</option></select></label>
+          <label>Nooca dharka<select name="garment" required><option value="">Dooro nooca</option><option value="shaati">Shaati</option><option value="sarwaal">Sarwaal</option><option value="khamiis">Khamiis</option><option value="futushari">Futushari</option></select></label>
         </div>
         <div class="modal-measure-block paper-sheet">
           <div class="invoice-stamp">GANEEY TAILOR</div>
@@ -257,10 +273,31 @@
             <label><span>L</span><input data-modal-measure="Sare L" /></label><label><span>B</span><input data-modal-measure="Sare B" /></label><label><span>P</span><input data-modal-measure="Sare P" /></label><label><span>S</span><input data-modal-measure="Sare S" /></label><label><span>M</span><input data-modal-measure="Sare M" /></label><label><span>K</span><input data-modal-measure="Sare K" /></label><label><span>X</span><input data-modal-measure="Sare X" /></label><label><span>X</span><input data-modal-measure="Sare X 2" /></label><label><span>G</span><input data-modal-measure="Sare G" /></label>
             <label><span>L</span><input data-modal-measure="Hoose L" /></label><label><span>B</span><input data-modal-measure="Hoose B" /></label><label><span>P</span><input data-modal-measure="Hoose P" /></label><label><span>K</span><input data-modal-measure="Hoose K" /></label><label><span>C</span><input data-modal-measure="Hoose C" /></label><label><span>T</span><input data-modal-measure="Hoose T" /></label>
           </div>
+          <div class="image-upload-grid">
+            <label>Midabka Sare<input type="file" accept="image/*" data-modal-image="upper" /></label>
+            <label>Midabka Hoose<input type="file" accept="image/*" data-modal-image="lower" /></label>
+          </div>
+          <div class="image-preview-grid" data-modal-image-previews></div>
         </div>
         <label>Qoraal<textarea name="note" rows="3" placeholder="Faahfaahin kooban..."></textarea></label>
         <p class="form-status" data-form-status></p>
         <div class="modal-actions"><button class="outline-btn" type="button" data-close-customer>Jooji</button><button class="black-btn" type="submit">Keydi Macmiil</button></div>
+      </form>
+    </div>
+    <div class="modal" data-profile-modal aria-hidden="true">
+      <form class="modal-card" data-profile-form>
+        <button class="modal-close" type="button" data-close-profile aria-label="Xir">x</button>
+        <p class="kicker">Profile</p>
+        <h2>Dejinta Profile-ka</h2>
+        <div class="form-grid">
+          <label>Magaca<input name="name" placeholder="Magacaaga" /></label>
+          <label>Email<input name="email" type="email" disabled /></label>
+          <label>Password cusub<input name="password" type="password" minlength="6" placeholder="Ikhtiyaari" /></label>
+          <label>2FA telefoon<input name="twofaPhone" placeholder="+252..." /></label>
+        </div>
+        <label class="check-row"><input name="twofaEnabled" type="checkbox" /> Daar 2FA</label>
+        <p class="form-status" data-profile-status></p>
+        <div class="modal-actions"><button class="outline-btn" type="button" data-close-profile>Jooji</button><button class="black-btn" type="submit">Keydi Profile</button></div>
       </form>
     </div>
     <script src="script.js"></script>
