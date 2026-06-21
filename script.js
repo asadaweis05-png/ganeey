@@ -384,6 +384,12 @@ const parseMoney = (value) => {
 
 const formatMoney = (value) => `$${Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
 
+const formatGarment = (customer) => {
+  const garment = customer?.garment || "Macmiil cusub";
+  const quantity = Math.min(10, Math.max(1, Number(customer?.quantity || 1)));
+  return `${garment} x${quantity}`;
+};
+
 const getCustomerPayment = (customer) => {
   const record = measurements[customer.id];
   const fields = record?.fields || {};
@@ -447,7 +453,7 @@ const renderSearchResults = (query) => {
   }
 
   const matches = customers.filter((customer) =>
-    [customer.name, customer.phone, customer.city, customer.garment].some((value) => String(value || "").toLowerCase().includes(term))
+    [customer.name, customer.phone, customer.city, customer.garment, customer.quantity, formatGarment(customer)].some((value) => String(value || "").toLowerCase().includes(term))
   );
 
   searchResults.innerHTML = matches.length
@@ -455,7 +461,7 @@ const renderSearchResults = (query) => {
         .map((customer) => {
           const index = customers.findIndex((item) => item.id === customer.id);
           const payment = getCustomerPayment(customer);
-          return `<button type="button" data-search-customer="${index}"><span><strong>${escapeHtml(customer.name)}</strong><small>${escapeHtml(customer.phone || "")} · ${escapeHtml(customer.garment || "")}</small></span><b>${formatMoney(payment.balance)}</b></button>`;
+          return `<button type="button" data-search-customer="${index}"><span><strong>${escapeHtml(customer.name)}</strong><small>${escapeHtml(customer.phone || "")} · ${escapeHtml(formatGarment(customer))}</small></span><b>${formatMoney(payment.balance)}</b></button>`;
         })
         .join("")
     : '<div class="empty-state">Macmiil lama helin.</div>';
@@ -488,7 +494,7 @@ const renderHaraaList = () => {
     ? rows
         .map((row) => {
           const index = customers.findIndex((customer) => customer.id === row.customer.id);
-          return `<button class="haraa-row" type="button" data-profile-customer="${index}"><span><strong>${escapeHtml(row.customer.name)}</strong><small>${escapeHtml(row.customer.phone || "Telefoon lama gelin")}</small></span><b>${formatMoney(row.balance)}</b></button>`;
+          return `<button class="haraa-row" type="button" data-profile-customer="${index}"><span><strong>${escapeHtml(row.customer.name)}</strong><small>${escapeHtml(row.customer.phone || "Telefoon lama gelin")} · ${escapeHtml(formatGarment(row.customer))}</small></span><b>${formatMoney(row.balance)}</b></button>`;
         })
         .join("")
     : '<div class="empty-state">Hadda macmiil haraa leh ma jiro.</div>';
@@ -560,7 +566,7 @@ const renderCustomers = () => {
         const status = payment.balance > 0 ? "Haraa" : payment.paid > 0 ? "Bixiyay" : "Sugaya";
         return `
         <tr>
-          <td><span class="mini-avatar ${index % 2 ? "gold" : "navy"}">${initials(customer.name)}</span><div>${escapeHtml(customer.name)}<small>${escapeHtml(customer.garment || "Macmiil cusub")}</small></div></td>
+          <td><span class="mini-avatar ${index % 2 ? "gold" : "navy"}">${initials(customer.name)}</span><div>${escapeHtml(customer.name)}<small>${escapeHtml(formatGarment(customer))}</small></div></td>
           <td><mark class="${payment.balance > 0 ? "red" : payment.paid > 0 ? "" : "gray"}">${status}</mark></td>
           <td>${formatMoney(payment.paid)} / ${formatMoney(payment.balance)}</td>
           <td><button class="table-action" data-select-customer="${index}">Cabbir</button></td>
@@ -585,7 +591,7 @@ const renderCustomerDirectory = () => {
           (customer, index) => `
             <button class="customer-row ${selectedCustomer?.id === customer.id ? "is-active" : ""}" type="button" data-profile-customer="${index}">
               <span class="mini-avatar ${index % 2 ? "gold" : "navy"}">${initials(customer.name)}</span>
-              <span><strong>${escapeHtml(customer.name)}</strong><small>${escapeHtml(customer.phone || "Telefoon lama gelin")} · ${escapeHtml(customer.city || "Magaalo lama gelin")}</small></span>
+              <span><strong>${escapeHtml(customer.name)}</strong><small>${escapeHtml(customer.phone || "Telefoon lama gelin")} · ${escapeHtml(customer.city || "Magaalo lama gelin")} · ${escapeHtml(formatGarment(customer))}</small></span>
               <em>${formatMoney(getCustomerPayment(customer).paid)} bixiyey · ${formatMoney(getCustomerPayment(customer).balance)} haraa</em>
             </button>`
         )
@@ -625,7 +631,7 @@ const renderProfile = () => {
   if (profileName) profileName.textContent = customer.name;
   if (profileMeta) profileMeta.textContent = `${customer.city || "Magaalo lama gelin"} · ${customer.phone || "Telefoon lama gelin"}`;
   const payment = getCustomerPayment(customer);
-  if (profileMeta) profileMeta.textContent = `${customer.city || "Magaalo lama gelin"} · ${customer.phone || "Telefoon lama gelin"} · Bixiyey ${formatMoney(payment.paid)} · Haraa ${formatMoney(payment.balance)}`;
+  if (profileMeta) profileMeta.textContent = `${customer.city || "Magaalo lama gelin"} · ${customer.phone || "Telefoon lama gelin"} · ${formatGarment(customer)} · Bixiyey ${formatMoney(payment.paid)} · Haraa ${formatMoney(payment.balance)}`;
   if (profileMeasureDate) profileMeasureDate.textContent = record?.updatedAt ? `La cusbooneysiiyay: ${formatDateTime(record.updatedAt)}` : "Weli lama cusbooneysiin";
   if (profileMeasures) {
     profileMeasures.innerHTML = Object.entries(measureAliases)
@@ -861,6 +867,7 @@ customerForm.addEventListener("submit", async (event) => {
     phone: String(form.get("phone") || "").trim(),
     city: String(form.get("city") || "").trim(),
     garment: String(form.get("garment") || "").trim(),
+    quantity: Math.min(10, Math.max(1, Number(form.get("quantity") || 1))),
     bixiyey: String(form.get("bixiyey") || "").trim(),
     haraa: String(form.get("haraa") || "").trim(),
     note: String(form.get("note") || "").trim(),
