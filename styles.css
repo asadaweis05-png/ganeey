@@ -1718,6 +1718,36 @@ blockquote {
   gap: 16px;
 }
 
+.garment-quantities {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.garment-quantities legend {
+  padding: 0 6px;
+  color: #303640;
+  font-weight: 800;
+}
+
+.garment-quantities p {
+  margin: 0 0 12px;
+  color: #68707b;
+  font-size: 0.9rem;
+}
+
+.garment-quantity-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.garment-quantity-grid label {
+  margin: 0;
+}
+
 .modal-card label {
   display: grid;
   gap: 6px;
@@ -1942,6 +1972,10 @@ blockquote {
   .signatures,
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .garment-quantity-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .letter-grid {

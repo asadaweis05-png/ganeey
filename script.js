@@ -384,10 +384,27 @@ const parseMoney = (value) => {
 
 const formatMoney = (value) => `$${Number(value || 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
 
+const garmentLabels = {
+  shaati: "Shaati",
+  sarwaal: "Sarwaal",
+  khamiis: "Khamiis",
+  futushari: "Futushari",
+};
+
+const getGarmentItems = (customer) => {
+  if (customer?.garmentItems && typeof customer.garmentItems === "object") {
+    return Object.entries(customer.garmentItems)
+      .map(([type, quantity]) => [type, Math.floor(Number(quantity))])
+      .filter(([type, quantity]) => garmentLabels[type] && Number.isFinite(quantity) && quantity > 0);
+  }
+
+  const quantity = Math.floor(Number(customer?.quantity || 1));
+  return customer?.garment && Number.isFinite(quantity) && quantity > 0 ? [[customer.garment, quantity]] : [];
+};
+
 const formatGarment = (customer) => {
-  const garment = customer?.garment || "Macmiil cusub";
-  const quantity = Math.min(10, Math.max(1, Number(customer?.quantity || 1)));
-  return `${garment} x${quantity}`;
+  const items = getGarmentItems(customer);
+  return items.length ? items.map(([type, quantity]) => `${garmentLabels[type] || type} x${quantity}`).join(", ") : "Dharka lama dooran";
 };
 
 const getCustomerPayment = (customer) => {
@@ -861,20 +878,26 @@ profileForm?.addEventListener("submit", async (event) => {
 customerForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   const form = new FormData(customerForm);
+  const garmentItems = Object.fromEntries(
+    Object.keys(garmentLabels)
+      .map((type) => [type, Math.floor(Number(form.get(`garment-${type}`) || 0))])
+      .filter(([, quantity]) => Number.isFinite(quantity) && quantity > 0)
+  );
   const customer = {
     id: crypto.randomUUID ? crypto.randomUUID() : `customer-${Date.now()}`,
     name: String(form.get("name") || "").trim(),
     phone: String(form.get("phone") || "").trim(),
     city: String(form.get("city") || "").trim(),
-    garment: String(form.get("garment") || "").trim(),
-    quantity: Math.min(10, Math.max(1, Number(form.get("quantity") || 1))),
+    garmentItems,
     bixiyey: String(form.get("bixiyey") || "").trim(),
     haraa: String(form.get("haraa") || "").trim(),
     note: String(form.get("note") || "").trim(),
   };
 
-  if (!customer.name || !customer.phone) {
-    formStatus.textContent = "Fadlan geli magaca iyo telefoonka.";
+  if (!customer.name || !customer.phone || !Object.keys(garmentItems).length) {
+    formStatus.textContent = !Object.keys(garmentItems).length
+      ? "Fadlan geli tirada ugu yaraan hal nooc oo dhar ah."
+      : "Fadlan geli magaca iyo telefoonka.";
     return;
   }
 
